@@ -20,7 +20,7 @@
     "markdown-to-text": "^0.1.1",
     "moment": "2.29.1",
     "node-sass": "6.0.0",
-    "nouislider": "15.1.0",
+    "nouislider": "15.2.0",
     "prism": "^4.1.2",
     "prismjs": "^1.24.1",
     "prop-types": "15.7.2",
