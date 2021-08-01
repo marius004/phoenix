@@ -37,7 +37,7 @@
     "yup": "^0.32.9"
   },
   "devDependencies": {
-    "@babel/cli": "7.13.16",
+    "@babel/cli": "7.14.8",
     "@babel/plugin-proposal-class-properties": "7.13.0",
     "@babel/preset-env": "7.14.1",
     "@babel/preset-react": "7.13.13",
