@@ -1,0 +1,14 @@
+# config files
+config.json 
+
+# logging files
+logs.txt
+
+#datastore
+tests
+
+#editor 
+.vscode
+
+containers
+tmp
