@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"io/fs"
 	"io/ioutil"
 	"log"
 	"os"
@@ -21,7 +22,6 @@ type Container struct {
 	path string
 	id   int
 
-	Debug 	 bool // for additional printing
 	metaFile string
 
 	config *models.Config
@@ -35,9 +35,9 @@ func (c *Container) GetPath(path string) string {
 	return c.path + "/" + path
 }
 
-func (c *Container) CreateDirectory(path string) error {
+func (c *Container) CreateDirectory(path string, perm fs.FileMode) error {
 	fullPath := c.GetPath(path)
-	return os.Mkdir(fullPath, 0755)
+	return os.Mkdir(fullPath, perm)
 }
 
 func (c *Container) DeleteDirectory(path string) error {
@@ -45,9 +45,9 @@ func (c *Container) DeleteDirectory(path string) error {
 	return os.RemoveAll(fullPath)
 }
 
-func (c *Container) WriteToFile(path string, data []byte) error {
+func (c *Container) WriteToFile(path string, data []byte, perm fs.FileMode) error {
 	fullPath := c.GetPath(path)
-	file, err := os.OpenFile(fullPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0777)
+	file, err := os.OpenFile(fullPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, perm)
 
 	if err != nil {
 		return err
@@ -59,9 +59,9 @@ func (c *Container) WriteToFile(path string, data []byte) error {
 	return err
 }
 
-func (c *Container) CreateFile(path string) error {
+func (c *Container) CreateFile(path string, perm fs.FileMode) error {
 	fullPath := c.GetPath(path)
-	file, err := os.OpenFile(fullPath, os.O_CREATE|os.O_RDONLY|os.O_TRUNC, 0777)
+	file, err := os.OpenFile(fullPath, os.O_CREATE|os.O_RDONLY|os.O_TRUNC, perm)
 
 	if err != nil {
 		return err
@@ -80,9 +80,9 @@ func (c *Container) DeleteFile(path string) error {
 }
 
 func (c *Container) ExecuteCommand(ctx context.Context, command []string, config *eval.RunConfig) (*eval.RunStatus, error) {
-	metaFile := path.Join(os.TempDir(),"pn-"+eval.RandomString(24)) // for the moment
+	metaFile := path.Join(os.TempDir(), "pn-"+eval.RandomString(24))
 	c.metaFile = metaFile
-	
+
 	defer func() { c.metaFile = "" }()
 
 	c.logger.Print("Command meta file: ", c.metaFile)
@@ -96,7 +96,7 @@ func (c *Container) ExecuteCommand(ctx context.Context, command []string, config
 	cmd.Stderr = config.Stderr
 
 	err := cmd.Run()
-	if _, ok := err.(*exec.ExitError); err != nil && ok {
+	if _, ok := err.(*exec.ExitError); ok {
 		metaData, metaFileErr := parseMetaFile(c.metaFile)
 		if metaFileErr != nil {
 			c.logger.Println(err)
@@ -130,11 +130,11 @@ func (c *Container) buildRunFlags(config *eval.RunConfig) (res []string) {
 	res = append(res, "--full-env")
 
 	if config.TimeLimit != 0 {
-		res = append(res, "--time="+strconv.FormatFloat(config.TimeLimit,'f', -1, 64))
+		res = append(res, "--time="+strconv.FormatFloat(config.TimeLimit, 'f', -1, 64))
 	}
 
 	if config.WallTimeLimit != 0 {
-		res = append(res, "--wall-time="+strconv.FormatFloat(config.WallTimeLimit,'f', -1, 64))
+		res = append(res, "--wall-time="+strconv.FormatFloat(config.WallTimeLimit, 'f', -1, 64))
 	}
 
 	if config.MemoryLimit != 0 {
@@ -181,11 +181,11 @@ func newContainer(id int, config *models.Config, logger *log.Logger) (*Container
 	}
 
 	path := string(ret)
-	return &Container{path: strings.TrimSpace(path), id: id, config: config, logger: logger, Debug: true}, nil
+	return &Container{path: strings.TrimSpace(path), id: id, config: config, logger: logger}, nil
 }
 
 func parseMetaFile(path string) (*eval.RunStatus, error) {
-	r, err := os.OpenFile(path, os.O_RDONLY, 0644)
+	r, err := os.OpenFile(path, os.O_RDONLY, 0777)
 	if err != nil {
 		return nil, err
 	}

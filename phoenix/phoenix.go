@@ -3,17 +3,18 @@ package phoenix
 import (
 	"context"
 	"fmt"
-	"github.com/marius004/phoenix/eval"
-	"github.com/marius004/phoenix/eval/container"
-	"github.com/marius004/phoenix/eval/tasks"
 	"log"
 	"net/http"
 
+	"github.com/marius004/phoenix/eval"
+	"github.com/marius004/phoenix/eval/container"
+	"github.com/marius004/phoenix/eval/tasks"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 	"github.com/marius004/phoenix/api"
 	"github.com/marius004/phoenix/database"
 	"github.com/marius004/phoenix/models"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/cors"
 )
 
 // Phoenix is a struct that wraps the functionality of the entire app
@@ -60,7 +61,7 @@ func (p *Phoenix) Run() {
 		Config: p.config,
 		Logger: p.logger,
 		Request: &eval.CompileRequest{
-			ID: 1,
+			ID:   1,
 			Code: []byte(code),
 			Lang: "c",
 		},
@@ -80,16 +81,16 @@ func (p *Phoenix) Run() {
 		Request: &eval.ExecuteRequest{
 			ID: 1,
 			Limit: eval.Limit{
-				Time: 1,
+				Time:   1,
 				Memory: 64000,
-				Stack: 32000,
+				Stack:  32000,
 			},
-			Lang: "c",
-			ProblemName: "marsx",
-			Input: []byte{49, 48, 32, 50, 48},
-			BinaryPath: "/tmp/bin/1.bin",
+			Lang:         "c",
+			ProblemName:  "marsx",
+			Input:        []byte{49, 48, 32, 50, 48},
+			BinaryPath:   "/tmp/pn-compile",
 			SubmissionId: 1,
-			TestId: 2,
+			TestId:       2,
 		},
 		Response: &eval.ExecuteResponse{},
 	}

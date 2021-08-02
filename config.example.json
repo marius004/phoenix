@@ -15,31 +15,31 @@
     "authCookieLifeTime": 7
   },
   "eval": {
-    "isolatePath": "/var/local/lib/isolate",
+    "isolatePath": "/usr/local/bin/isolate",
     "maxSandboxes": 10,
 
-    "compilePath": "/tmp/pnBinaries",
-    "outputPath": "/tmp/pnOutputs"
+    "compilePath": "/tmp/pn-compile",
+    "outputPath": "/tmp/pn-output"
   },
   "languages": {
     "c": {
       "extension": ".c",
       "isCompiled": true,
       "compile": [
-        "gcc",
+        "/bin/gcc",
         "-std=c11",
         "-O2",
         "-s",
         "-static",
-        "/box/main.c",
+        "main.c",
         "-o",
-        "/box/output"
+        "main"
       ],
       "execute": [
         "./main"
       ],
-      "sourceFile": "main.c",
-      "executable": "main"
+      "sourceFile": "box/main.c",
+      "executable": "box/main"
     }
   }
 }

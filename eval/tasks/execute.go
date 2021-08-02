@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/marius004/phoenix/eval"
-	"github.com/marius004/phoenix/models"
 	"io/ioutil"
 	"log"
 	"os"
 	"path"
+
+	"github.com/marius004/phoenix/eval"
+	"github.com/marius004/phoenix/models"
 )
 
 type ExecuteTask struct {
@@ -29,13 +30,13 @@ func (t *ExecuteTask) Run(ctx context.Context, sandbox eval.Sandbox) error {
 		return errors.New("no language found")
 	}
 
-	if err := sandbox.WriteToFile("box/"+t.Request.ProblemName+".in", t.Request.Input); err != nil {
+	if err := sandbox.WriteToFile("box/"+t.Request.ProblemName+".in", t.Request.Input, 0644); err != nil {
 		t.Logger.Println("Can't write the input file in the sandbox", err)
 		t.Response.Message = "Sandbox error: Cannot copy input file to the sandbox"
 		return err
 	}
 
-	if err := sandbox.CreateFile("box/"+t.Request.ProblemName+".out"); err != nil {
+	if err := sandbox.CreateFile("box/"+t.Request.ProblemName+".out", 0644); err != nil {
 		t.Logger.Println("Can't write the output file in the sandbox", err)
 		t.Response.Message = "Sandbox error: Cannot copy output file to the sandbox"
 		return err
@@ -68,17 +69,17 @@ func (t *ExecuteTask) Run(ctx context.Context, sandbox eval.Sandbox) error {
 		Time: t.Request.Time,
 
 		Memory: t.Request.Memory,
-		Stack: t.Request.Stack,
+		Stack:  t.Request.Stack,
 	}
 
-	metaFile, err := eval.ExecuteFile(ctx, sandbox, lang, t.Request.ProblemName, limit,t.Request.IsConsole)
+	metaFile, err := eval.ExecuteFile(ctx, sandbox, lang, t.Request.ProblemName, limit, t.Request.IsConsole)
 	if err != nil {
 		t.Logger.Println("could not execute the program", err)
 		t.Response.Message = fmt.Sprintf("Could not execute the program %s", err.Error())
 		return err
 	}
 
-	t.Response.TimeUsed   = metaFile.Time
+	t.Response.TimeUsed = metaFile.Time
 	t.Response.MemoryUsed = metaFile.Memory
 
 	switch metaFile.Status {
@@ -93,7 +94,7 @@ func (t *ExecuteTask) Run(ctx context.Context, sandbox eval.Sandbox) error {
 	}
 
 	if t.Response.ExitCode == 0 {
-		path := fmt.Sprintf("%s/file-managers%d-test%d.out", t.Config.OutputPath, t.Request.ID, t.Request.TestId)
+		path := fmt.Sprintf("%s/s%dt%d.out", t.Config.OutputPath, t.Request.ID, t.Request.TestId)
 		file, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 
 		if err != nil {

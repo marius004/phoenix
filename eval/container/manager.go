@@ -2,20 +2,21 @@ package container
 
 import (
 	"context"
+	"log"
+
 	"github.com/marius004/phoenix/eval"
 	"github.com/marius004/phoenix/models"
 	"golang.org/x/sync/semaphore"
-	"log"
 )
 
 // Manager implements eval.SandboxManager
 type Manager struct {
-	logger 	  *log.Logger
+	logger    *log.Logger
 	semaphore *semaphore.Weighted
-	config 	  *models.Config
+	config    *models.Config
 
 	maxConcurrentSandboxes int64
-	availableSandboxes 	   chan int
+	availableSandboxes     chan int
 }
 
 func (m *Manager) RunTask(ctx context.Context, task eval.Task) error {
@@ -26,7 +27,7 @@ func (m *Manager) RunTask(ctx context.Context, task eval.Task) error {
 		return err
 	}
 
-	defer sandbox.Cleanup()
+	// defer sandbox.Cleanup()
 	defer m.ReleaseSandbox(sandbox.GetID())
 
 	return task.Run(ctx, sandbox)
@@ -60,8 +61,8 @@ func NewManager(maxConcurrentSandboxes int64, config *models.Config, logger *log
 		logger: logger,
 		config: config,
 
-		semaphore: semaphore.NewWeighted(maxConcurrentSandboxes),
-		availableSandboxes: make(chan int, maxConcurrentSandboxes),
+		semaphore:              semaphore.NewWeighted(maxConcurrentSandboxes),
+		availableSandboxes:     make(chan int, maxConcurrentSandboxes),
 		maxConcurrentSandboxes: maxConcurrentSandboxes,
 	}
 

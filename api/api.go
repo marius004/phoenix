@@ -1,16 +1,17 @@
 package api
 
 import (
-	"github.com/marius004/phoenix/managers"
 	"log"
 	"net/http"
 
+	"github.com/marius004/phoenix/managers"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/jmoiron/sqlx"
 	"github.com/marius004/phoenix/database"
 	"github.com/marius004/phoenix/disk"
 	"github.com/marius004/phoenix/models"
 	"github.com/marius004/phoenix/services"
-	"github.com/go-chi/chi/v5"
-	"github.com/jmoiron/sqlx"
 )
 
 type API struct {

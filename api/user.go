@@ -3,8 +3,8 @@ package api
 import (
 	"net/http"
 
-	"github.com/marius004/phoenix/util"
 	"github.com/go-chi/chi/v5"
+	"github.com/marius004/phoenix/util"
 )
 
 // GetUserByUserName is the handler behind GET /api/users/{username}

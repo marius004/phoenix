@@ -3,17 +3,18 @@ package eval
 import (
 	"context"
 	"io"
+	"io/fs"
 )
 
 type Sandbox interface {
 	GetID() int
 	GetPath(path string) string
 
-	CreateDirectory(path string) error
+	CreateDirectory(path string, perm fs.FileMode) error
 	DeleteDirectory(path string) error
 
-	CreateFile(path string) error
-	WriteToFile(path string, data []byte) error
+	CreateFile(path string, perm fs.FileMode) error
+	WriteToFile(path string, data []byte, perm fs.FileMode) error
 	ReadFile(path string) ([]byte, error)
 	DeleteFile(path string) error
 
@@ -34,7 +35,7 @@ type SandboxManager interface {
 	Stop(ctx context.Context) error
 }
 
-// RunConfig represents the configuration for a Task. 
+// RunConfig represents the configuration for a Task.
 type RunConfig struct {
 	Stdin  io.Reader
 	Stdout io.Writer
@@ -46,7 +47,7 @@ type RunConfig struct {
 	InputPath  string
 	OutputPath string
 
-	TimeLimit 	  float64
+	TimeLimit     float64
 	WallTimeLimit float64
 
 	MaxProcesses int
@@ -58,55 +59,55 @@ type RunStatus struct {
 
 	ExitCode   int  `json:"exitCode"`
 	ExitSignal int  `json:"exitSignal"`
-	Killed 	   bool `json:"killed"`
+	Killed     bool `json:"killed"`
 
 	Message string `json:"message"`
 	Status  string `json:"status"`
 
-	Time 	 float64 `json:"time"`
+	Time     float64 `json:"time"`
 	WallTime float64 `json:"wallTime"`
 }
 
 type CompileRequest struct {
-	ID   int  // ID is the file-managers ID.
+	ID   int // ID is the file-managers ID.
 	Code []byte
-	Lang string 
+	Lang string
 }
 
 type CompileResponse struct {
 	Output string
-	Other string
+	Other  string
 
-	Success bool 
+	Success bool
 }
 
 type Limit struct {
-	Time 	float64
-	Memory  int
-	Stack 	int
+	Time   float64
+	Memory int
+	Stack  int
 }
 
 type ExecuteRequest struct {
 	ID int
 
 	SubmissionId int
-	TestId 		 int
+	TestId       int
 
 	Limit
 
-	Lang 		string
+	Lang        string
 	ProblemName string
 
-	IsConsole 	bool
-	Input 		[]byte
+	IsConsole bool
+	Input     []byte
 
-	BinaryPath  string
+	BinaryPath string
 }
 
 type ExecuteResponse struct {
-	TimeUsed 	float64
-	MemoryUsed  int
+	TimeUsed   float64
+	MemoryUsed int
 
 	ExitCode int
-	Message string
+	Message  string
 }

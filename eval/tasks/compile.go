@@ -44,7 +44,7 @@ func (task *CompileTask) Run(ctx context.Context, sandbox eval.Sandbox) error {
 			return err
 		}
 
-		file, err := os.OpenFile(binaryPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+		file, err := os.OpenFile(binaryPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 7777)
 
 		// logging data in case of failure
 		if !task.Response.Success {
@@ -58,7 +58,7 @@ func (task *CompileTask) Run(ctx context.Context, sandbox eval.Sandbox) error {
 			return err
 		}
 
-		if err := eval.CopyFromSandbox(sandbox,lang.Executable, file); err != nil {
+		if err := eval.CopyFromSandbox(sandbox, lang.Executable, file); err != nil {
 			task.Response.Other = err.Error()
 			task.Response.Success = false
 			task.Logger.Printf("Could not copy the binary file from sandbox %d %s\n", sandbox.GetID(), err.Error())

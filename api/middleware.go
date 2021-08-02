@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/marius004/phoenix/util"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-chi/chi/v5"
+	"github.com/marius004/phoenix/util"
 )
 
 // MustNotBeAuthed is a middleware that makes sure that the user creating the request is not authenticated.
