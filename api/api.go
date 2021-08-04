@@ -3,7 +3,10 @@ package api
 import (
 	"log"
 	"net/http"
+	"time"
 
+	"github.com/marius004/phoenix/eval"
+	"github.com/marius004/phoenix/eval/evaluator"
 	"github.com/marius004/phoenix/managers"
 
 	"github.com/go-chi/chi/v5"
@@ -24,6 +27,7 @@ type API struct {
 	testService       services.TestService
 	submissionService services.SubmissionService
 
+	evaluator   *evaluator.Evaluator
 	testManager managers.TestManager
 }
 
@@ -36,6 +40,7 @@ func New(db *database.DB, config *models.Config, logger *log.Logger) *API {
 		submissionService = db.SubmissionService(logger)
 
 		testManager = disk.NewTestManager("tests")
+		evaluator   = evaluator.New(100*time.Millisecond, evaluatorServices(problemService, submissionService, testService, testManager), config)
 	)
 
 	return &API{
@@ -49,6 +54,7 @@ func New(db *database.DB, config *models.Config, logger *log.Logger) *API {
 		submissionService: submissionService,
 
 		testManager: testManager,
+		evaluator:   evaluator,
 	}
 }
 
@@ -95,6 +101,8 @@ func (s *API) Routes() http.Handler {
 		r.With(s.ProblemCtx, s.MustBeProposer).Get("/{problemName}", s.GetProblemTests)
 	})
 
+	go s.evaluator.Serve()
+
 	r.Route("/submissions", func(r chi.Router) {
 		r.Get("/", s.GetSubmissions)
 		r.With(s.SubmissionCtx).Get("/{submissionId}", s.GetSubmissionById)
@@ -102,4 +110,14 @@ func (s *API) Routes() http.Handler {
 	})
 
 	return r
+}
+
+func evaluatorServices(problemService services.ProblemService, submissionService services.SubmissionService, testService services.TestService, testManager managers.TestManager) *eval.EvaluatorServices {
+	return &eval.EvaluatorServices{
+		ProblemService:    problemService,
+		SubmissionService: submissionService,
+		TestService:       testService,
+
+		TestManager: testManager,
+	}
 }

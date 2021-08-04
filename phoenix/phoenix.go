@@ -1,14 +1,9 @@
 package phoenix
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
-
-	"github.com/marius004/phoenix/eval"
-	"github.com/marius004/phoenix/eval/container"
-	"github.com/marius004/phoenix/eval/tasks"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
@@ -43,65 +38,6 @@ func New() *Phoenix {
 func (p *Phoenix) Run() {
 	r := chi.NewRouter()
 
-	manager := container.NewManager(10, p.config, p.logger)
-
-	// compile
-	code := `
-	#include <stdio.h>
-	int main() {
-   	// printf() displays the string inside quotation
-	int i;
-	for(i = 1;i <= 10;++i) {
-	   	printf("Hello, World!");
-	}
-   	return 0;
-	}`
-
-	compile := &tasks.CompileTask{
-		Config: p.config,
-		Logger: p.logger,
-		Request: &eval.CompileRequest{
-			ID:   1,
-			Code: []byte(code),
-			Lang: "c",
-		},
-		Response: &eval.CompileResponse{},
-	}
-
-	err := manager.RunTask(context.Background(), compile)
-	if err != nil {
-		fmt.Println(err)
-		fmt.Println(compile.Response)
-	}
-
-	// execute
-	execute := &tasks.ExecuteTask{
-		Config: p.config,
-		Logger: p.logger,
-		Request: &eval.ExecuteRequest{
-			ID: 1,
-			Limit: eval.Limit{
-				Time:   1,
-				Memory: 64000,
-				Stack:  32000,
-			},
-			Lang:         "c",
-			ProblemName:  "marsx",
-			Input:        []byte{49, 48, 32, 50, 48},
-			BinaryPath:   "/tmp/pn-compile",
-			SubmissionId: 1,
-			TestId:       2,
-		},
-		Response: &eval.ExecuteResponse{},
-	}
-
-	err = manager.RunTask(context.Background(), execute)
-	if err != nil {
-		fmt.Println(err)
-		fmt.Println(execute.Response)
-	}
-
-	//change cors config according to my needs
 	corsConfig := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -111,7 +47,6 @@ func (p *Phoenix) Run() {
 	})
 
 	r.Use(corsConfig.Handler)
-
 	r.Mount("/api", p.api.Routes())
 
 	server := &http.Server{

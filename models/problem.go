@@ -84,7 +84,7 @@ type UpdateProblemRequest struct {
 	Difficulty       ProblemDifficulty `json:"difficulty"`
 	Grade            ProblemGrade      `json:"grade"`
 	Credits          string            `json:"credits"`
-	Stream           StreamFlag        `json:"stream"`
+	Stream           StreamFlag        `json:"stream"` // TODO the validation is broken
 
 	TimeLimit   float64 `json:"timeLimit"`
 	MemoryLimit int     `json:"memoryLimit"`

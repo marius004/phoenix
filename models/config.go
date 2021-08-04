@@ -15,17 +15,18 @@ type Eval struct {
 	IsolatePath  string `json:"isolatePath"`
 	MaxSandboxes int    `json:"maxSandboxes"`
 
-	CompilePath  string `json:"compilePath"`
-	OutputPath   string `json:"outputPath"`
+	CompilePath string `json:"compilePath"`
+	OutputPath  string `json:"outputPath"`
+	LoggerPath  string `json:"loggerPath"`
 }
 
 type Language struct {
-	Extension string `json:"extension"`
-	IsCompiled bool `json:"isCompiled"`
-	
+	Extension  string `json:"extension"`
+	IsCompiled bool   `json:"isCompiled"`
+
 	Compile []string `json:"compile"`
 	Execute []string `json:"execute"`
-	
+
 	SourceFile string `json:"sourceFile"`
 	Executable string `json:"executable"`
 }
@@ -52,7 +53,7 @@ type Api struct {
 // It holds basic configurations for the server to run
 type Config struct {
 	Database `json:"database"`
-	Server 	 `json:"server"`
+	Server   `json:"server"`
 
 	Api  `json:"api"`
 	Eval `json:"eval"`

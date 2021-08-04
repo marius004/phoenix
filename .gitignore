@@ -3,6 +3,7 @@ config.json
 
 # logging files
 logs.txt
+eval.txt
 
 #datastore
 tests

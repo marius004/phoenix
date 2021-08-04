@@ -12,6 +12,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/marius004/phoenix/eval"
 	"github.com/marius004/phoenix/models"
@@ -23,6 +24,7 @@ type Container struct {
 	id   int
 
 	metaFile string
+	mutex    sync.Mutex
 
 	config *models.Config
 	logger *log.Logger
@@ -80,6 +82,9 @@ func (c *Container) DeleteFile(path string) error {
 }
 
 func (c *Container) ExecuteCommand(ctx context.Context, command []string, config *eval.RunConfig) (*eval.RunStatus, error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	metaFile := path.Join(os.TempDir(), "pn-"+eval.RandomString(24))
 	c.metaFile = metaFile
 
@@ -110,6 +115,9 @@ func (c *Container) ExecuteCommand(ctx context.Context, command []string, config
 }
 
 func (c *Container) Cleanup() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	var params []string
 
 	params = append(params, "--cg")

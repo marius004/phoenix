@@ -27,28 +27,30 @@ func (m *Manager) RunTask(ctx context.Context, task eval.Task) error {
 		return err
 	}
 
-	// defer sandbox.Cleanup()
-	defer m.ReleaseSandbox(sandbox.GetID())
+	defer m.ReleaseSandbox(sandbox)
 
 	return task.Run(ctx, sandbox)
 }
 
-func (m *Manager) ReleaseSandbox(id int) {
-	m.semaphore.Release(1)
-	m.availableSandboxes <- id
+func (m *Manager) ReleaseSandbox(sandbox eval.Sandbox) {
+	//m.semaphore.Release(1)
+	sandbox.Cleanup()
+	m.availableSandboxes <- sandbox.GetID()
 }
 
 func (m *Manager) Stop(ctx context.Context) error {
-	if err := m.semaphore.Acquire(ctx, m.maxConcurrentSandboxes); err != nil {
-		return err
-	}
+	// if err := m.semaphore.Acquire(ctx, m.maxConcurrentSandboxes); err != nil {
+	// 	return err
+	// }
+
+	close(m.availableSandboxes)
 	return nil
 }
 
 func (m *Manager) getSandbox() (eval.Sandbox, error) {
-	if err := m.semaphore.Acquire(context.Background(), 1); err != nil {
-		return nil, err
-	}
+	// if err := m.semaphore.Acquire(context.Background(), 1); err != nil {
+	// 	return nil, err
+	// }
 	return m.newSandbox(<-m.availableSandboxes)
 }
 
@@ -56,18 +58,18 @@ func (m *Manager) newSandbox(id int) (*Container, error) {
 	return newContainer(id, m.config, m.logger)
 }
 
-func NewManager(maxConcurrentSandboxes int64, config *models.Config, logger *log.Logger) eval.SandboxManager {
+func NewManager(config *models.Config, logger *log.Logger) eval.SandboxManager {
 	manager := &Manager{
 		logger: logger,
 		config: config,
 
-		semaphore:              semaphore.NewWeighted(maxConcurrentSandboxes),
-		availableSandboxes:     make(chan int, maxConcurrentSandboxes),
-		maxConcurrentSandboxes: maxConcurrentSandboxes,
+		semaphore:              semaphore.NewWeighted(int64(config.MaxSandboxes)),
+		availableSandboxes:     make(chan int, config.MaxSandboxes),
+		maxConcurrentSandboxes: int64(config.MaxSandboxes),
 	}
 
 	// filling the channel with ids for sandboxes
-	for i := 1; i <= int(maxConcurrentSandboxes); i++ {
+	for i := 1; i <= int(config.MaxSandboxes); i++ {
 		manager.availableSandboxes <- i
 	}
 

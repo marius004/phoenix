@@ -4,6 +4,10 @@ import (
 	"context"
 	"io"
 	"io/fs"
+
+	"github.com/marius004/phoenix/managers"
+	"github.com/marius004/phoenix/models"
+	"github.com/marius004/phoenix/services"
 )
 
 type Sandbox interface {
@@ -75,9 +79,7 @@ type CompileRequest struct {
 }
 
 type CompileResponse struct {
-	Output string
-	Other  string
-
+	Output  string
 	Success bool
 }
 
@@ -110,4 +112,16 @@ type ExecuteResponse struct {
 
 	ExitCode int
 	Message  string
+}
+
+type EvaluatorServices struct {
+	ProblemService    services.ProblemService
+	SubmissionService services.SubmissionService
+	TestService       services.TestService
+
+	TestManager managers.TestManager
+}
+
+type Handler interface {
+	Handle(next chan *models.Submission) 
 }

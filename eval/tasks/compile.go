@@ -39,34 +39,33 @@ func (task *CompileTask) Run(ctx context.Context, sandbox eval.Sandbox) error {
 
 		if err != nil {
 			task.Response.Success = false
-			task.Response.Other = err.Error()
+			task.Response.Output = err.Error()
 			task.Logger.Printf("Could not compile %s\n", err.Error())
 			return err
+		} else if output != "" {
+			task.Response.Success = false
+			task.Response.Output = output
+			return nil
 		}
 
-		file, err := os.OpenFile(binaryPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 7777)
-
-		// logging data in case of failure
-		if !task.Response.Success {
-			defer task.Logger.Println(task.Response.Output, task.Response.Other, task.Response.Success)
-		}
+		file, err := os.OpenFile(binaryPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0664)
 
 		if err != nil {
-			task.Response.Other = err.Error()
+			task.Response.Output = err.Error()
 			task.Response.Success = false
 			task.Logger.Printf("Could not create the binary file %s\n", err.Error())
 			return err
 		}
 
 		if err := eval.CopyFromSandbox(sandbox, lang.Executable, file); err != nil {
-			task.Response.Other = err.Error()
+			task.Response.Output = err.Error()
 			task.Response.Success = false
 			task.Logger.Printf("Could not copy the binary file from sandbox %d %s\n", sandbox.GetID(), err.Error())
 			return err
 		}
 
 		if err := file.Close(); err != nil {
-			task.Response.Other = err.Error()
+			task.Response.Output = err.Error()
 			task.Response.Success = false
 			task.Logger.Printf("Could not close the binary file %s\n", err.Error())
 			return err
