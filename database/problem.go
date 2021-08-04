@@ -8,8 +8,8 @@ import (
 	"log"
 	"strings"
 
-	"github.com/marius004/phoenix/models"
 	"github.com/jmoiron/sqlx"
+	"github.com/marius004/phoenix/models"
 )
 
 // ProblemService implements services.ProblemService
@@ -154,7 +154,7 @@ func (s *ProblemService) ExistsById(ctx context.Context, id int) (bool, error) {
 	return count > 0, err
 }
 
-// RESTRUCTURE THE REPETITIVE FORs within every if
+// RESTRUCTURE THIS PIECE OF CODE ACCORDING TO DRY!!
 func (s *ProblemService) filterMaker(filter *models.ProblemFilter) ([]string, []interface{}) {
 	var query []string
 	var args []interface{}
