@@ -17,7 +17,7 @@ func (s *SubmissionTestService) GetBySubmissionId(ctx context.Context, submissio
 	var submissionTests []*models.SubmissionTest
 
 	query := "SELECT * FROM submission_tests WHERE submission_id = ?"
-	err := s.db.GetContext(ctx, &submissionTests, s.db.Rebind(query), submissionId)
+	err := s.db.Select(&submissionTests, s.db.Rebind(query), submissionId)
 
 	if err != nil {
 		return nil, err

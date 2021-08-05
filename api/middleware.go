@@ -147,7 +147,7 @@ func (s *API) SubmissionCtx(next http.Handler) http.Handler {
 		submissionId, err := strconv.Atoi(chi.URLParam(r, "submissionId"))
 
 		if err != nil {
-			util.ErrorResponse(w, http.StatusBadRequest, "Invalid file-managers id", s.logger)
+			util.ErrorResponse(w, http.StatusBadRequest, "Invalid submission id", s.logger)
 			return
 		}
 
@@ -163,6 +163,31 @@ func (s *API) SubmissionCtx(next http.Handler) http.Handler {
 		}
 
 		ctx := context.WithValue(r.Context(), util.SubmissionContextKey, submission)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func (s *API) SubmissionTestCtx(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		submissionTestId, err := strconv.Atoi(chi.URLParam(r, "submissionTestId"))
+
+		if err != nil {
+			util.ErrorResponse(w, http.StatusBadRequest, "Invalid submission test id", s.logger)
+			return
+		}
+
+		if submissionTestId < 0 {
+			util.DataResponse(w, http.StatusNotFound, "Submission not found", s.logger)
+			return
+		}
+
+		submissionTest, err := s.submissionTestService.GetById(r.Context(), uint64(submissionTestId))
+		if err != nil || submissionTest == nil {
+			util.DataResponse(w, http.StatusNotFound, "Submission test not found", s.logger)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), util.SubmissionTestContextKey, submissionTest)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

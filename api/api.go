@@ -115,6 +115,10 @@ func (s *API) Routes() http.Handler {
 		r.With(s.MustBeAuthed).Post("/", s.CreateSubmission)
 	})
 
+	r.Route("/submission-tests", func(r chi.Router) {
+		r.With(s.SubmissionCtx).Get("/{submissionId}", s.GetSubmissionTests)
+	})
+
 	return r
 }
 
@@ -126,7 +130,6 @@ func evaluatorServices(problemService services.ProblemService, submissionService
 		SubmissionTestService: submissionTestService,
 
 		TestService: testService,
-
 		TestManager: testManager,
 	}
 }

@@ -9,10 +9,12 @@ import (
 type ContextType string
 
 const (
-	UserContextKey       = ContextType("user")
-	ProblemContextKey    = ContextType("problem")
-	TestContextKey       = ContextType("test")
-	SubmissionContextKey = ContextType("file-managers")
+	UserContextKey    = ContextType("user")
+	ProblemContextKey = ContextType("problem")
+	TestContextKey    = ContextType("test")
+
+	SubmissionContextKey     = ContextType("submission")
+	SubmissionTestContextKey = ContextType("submissionTest")
 )
 
 // UserFromRequestContext returns a pointer to the user from request context
@@ -58,6 +60,17 @@ func SubmissionFromRequestContext(r *http.Request) *models.Submission {
 		return &submission
 	case *models.Submission:
 		return submission
+	default:
+		return nil
+	}
+}
+
+func SubmissionTestFromRequestContext(r *http.Request) *models.SubmissionTest {
+	switch submissionTest := r.Context().Value(SubmissionTestContextKey).(type) {
+	case models.SubmissionTest:
+		return &submissionTest
+	case *models.SubmissionTest:
+		return submissionTest
 	default:
 		return nil
 	}
