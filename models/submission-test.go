@@ -10,9 +10,11 @@ type SubmissionTest struct {
 	Time   float64 `json:"time"`
 	Memory int     `json:"memory"` // in kb
 
-	SubmissionId uint64 `json:"submissionId"`
-	UserId       uint64 `json:"userId"`
-	TestId       uint64 `json:"testId"`
+	Message  string `json:"message"`
+	ExitCode int    `json:"exitCode" db:"exit_code"`
+
+	SubmissionId uint64 `json:"submissionId" db:"submission_id"`
+	TestId       uint64 `json:"testId" db:"test_id"`
 }
 
 func NewSubmissionTest(score int, time float64, memory int, submissionId, userId, testId uint64) *SubmissionTest {
@@ -22,7 +24,6 @@ func NewSubmissionTest(score int, time float64, memory int, submissionId, userId
 		Memory: memory,
 
 		SubmissionId: submissionId,
-		UserId:       userId,
 		TestId:       testId,
 	}
 }

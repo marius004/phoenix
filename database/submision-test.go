@@ -41,11 +41,12 @@ func (s *SubmissionTestService) GetById(ctx context.Context, id uint64) (*models
 func (s *SubmissionTestService) Create(ctx context.Context, tst *models.SubmissionTest) error {
 	var id uint64
 
-	query := "INSERT INTO submission_tests(score, time, memory, submission_id, user_id, test_id) VALUES(?,?,?,?,?,?) RETURNING id"
+	query := "INSERT INTO submission_tests(score, time, memory, message, exit_code, submission_id, test_id) VALUES(?,?,?,?,?,?,?) RETURNING id"
 
 	err := s.db.GetContext(ctx, &id, s.db.Rebind(query),
 		tst.Score, tst.Time, tst.Memory,
-		tst.SubmissionId, tst.UserId, tst.TestId)
+		tst.Message, tst.ExitCode,
+		tst.SubmissionId, tst.TestId)
 
 	if err == nil {
 		tst.Id = id

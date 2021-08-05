@@ -10,9 +10,9 @@ import (
 
 	"github.com/marius004/phoenix/models"
 
-	"github.com/marius004/phoenix/services"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
+	"github.com/marius004/phoenix/services"
 )
 
 //go:embed psql_schema
@@ -91,4 +91,8 @@ func (db *DB) TestService(logger *log.Logger) services.TestService {
 
 func (db *DB) SubmissionService(logger *log.Logger) services.SubmissionService {
 	return NewSubmissionService(db.Conn, logger)
+}
+
+func (db *DB) SubmissionTestService(logger *log.Logger) services.SubmissionTestService {
+	return NewSubmissionTestService(db.Conn, logger)
 }

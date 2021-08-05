@@ -67,6 +67,10 @@ type Problem struct {
 	SourceSize  int     `json:"sourceSize" db:"source_size"`
 }
 
+func (p Problem) IsConsoleProblem() bool {
+	return p.Stream == CONSOLE
+}
+
 type ProblemFilter struct {
 	AuthorsId    []int
 	Difficulties []string
