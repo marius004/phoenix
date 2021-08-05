@@ -22,10 +22,12 @@ type API struct {
 	config *models.Config
 	logger *log.Logger
 
-	userService       services.UserService
-	problemService    services.ProblemService
-	testService       services.TestService
-	submissionService services.SubmissionService
+	userService    services.UserService
+	problemService services.ProblemService
+	testService    services.TestService
+
+	submissionService     services.SubmissionService
+	submissionTestService services.SubmissionTestService
 
 	evaluator   *evaluator.Evaluator
 	testManager managers.TestManager
@@ -34,13 +36,15 @@ type API struct {
 // New declares a new API instance
 func New(db *database.DB, config *models.Config, logger *log.Logger) *API {
 	var (
-		userService       = db.UserService(logger)
-		problemService    = db.ProblemService(logger)
-		testService       = db.TestService(logger)
-		submissionService = db.SubmissionService(logger)
+		userService    = db.UserService(logger)
+		problemService = db.ProblemService(logger)
+		testService    = db.TestService(logger)
+
+		submissionService     = db.SubmissionService(logger)
+		submissionTestService = db.SubmissionTestService(logger)
 
 		testManager = disk.NewTestManager("tests")
-		evaluator   = evaluator.New(100*time.Millisecond, evaluatorServices(problemService, submissionService, testService, testManager), config)
+		evaluator   = evaluator.New(100*time.Millisecond, evaluatorServices(problemService, submissionService, submissionTestService, testService, testManager), config)
 	)
 
 	return &API{
@@ -48,10 +52,12 @@ func New(db *database.DB, config *models.Config, logger *log.Logger) *API {
 		config: config,
 		logger: logger,
 
-		userService:       userService,
-		problemService:    problemService,
-		testService:       testService,
-		submissionService: submissionService,
+		userService:    userService,
+		problemService: problemService,
+		testService:    testService,
+
+		submissionService:     submissionService,
+		submissionTestService: submissionTestService,
 
 		testManager: testManager,
 		evaluator:   evaluator,
@@ -112,11 +118,14 @@ func (s *API) Routes() http.Handler {
 	return r
 }
 
-func evaluatorServices(problemService services.ProblemService, submissionService services.SubmissionService, testService services.TestService, testManager managers.TestManager) *eval.EvaluatorServices {
+func evaluatorServices(problemService services.ProblemService, submissionService services.SubmissionService, submissionTestService services.SubmissionTestService, testService services.TestService, testManager managers.TestManager) *eval.EvaluatorServices {
 	return &eval.EvaluatorServices{
-		ProblemService:    problemService,
-		SubmissionService: submissionService,
-		TestService:       testService,
+		ProblemService: problemService,
+
+		SubmissionService:     submissionService,
+		SubmissionTestService: submissionTestService,
+
+		TestService: testService,
 
 		TestManager: testManager,
 	}

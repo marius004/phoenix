@@ -5,6 +5,7 @@ import (
 	"context"
 	"io"
 	"math/rand"
+	"strconv"
 	"strings"
 
 	"github.com/marius004/phoenix/models"
@@ -76,4 +77,8 @@ func ExecuteFile(ctx context.Context, sandbox Sandbox, lang models.Language, pro
 	runConf.OutputPath = problemName + ".out"
 
 	return sandbox.ExecuteCommand(ctx, lang.Execute, &runConf)
+}
+
+func GetBinaryName(config *models.Config, submissionId int) string {
+	return config.CompilePath + "/" + strconv.Itoa(submissionId) + ".bin"
 }

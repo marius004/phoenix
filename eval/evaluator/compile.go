@@ -2,7 +2,6 @@ package evaluator
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/marius004/phoenix/eval"
@@ -19,7 +18,7 @@ type CompileHandler struct {
 	semaphore   *semaphore.Weighted
 	submissions chan *models.Submission
 
-	services       *eval.EvaluatorServices
+	services       *eval.CompileServices
 	sandboxManager eval.SandboxManager
 }
 
@@ -31,7 +30,7 @@ func (handler *CompileHandler) Handle(next chan *models.Submission) {
 			continue
 		}
 
-		fmt.Println(submission.Id)
+		handler.logger.Printf("Compiling submission %d\n", submission.Id)
 
 		go func(submission *models.Submission) {
 			defer handler.semaphore.Release(1)
@@ -60,24 +59,23 @@ func (handler *CompileHandler) Handle(next chan *models.Submission) {
 			if !compile.Response.Success {
 				if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), UpdateSubmissionErr(compile.Response.Output)); err != nil {
 					handler.logger.Println(err)
+					return
 				}
 			}
 
 			// succesful compilation
 			// this means that we will send the submission to the next handler(if one is present)
 			// (in this case send the submission to be executed)
+			if next != nil {
+				next <- submission
+			}
 
-			// TODO REMOVE THE COMMENTS
-			// REMOVING THE COMMENTS NOW WILL MAKE THE PROGRAM HANG!!!
-			// if next != nil {
-			// 	next <- submission
-			// }
 		}(submission)
 	}
 }
 
 func NewCompileHandler(config *models.Config, logger *log.Logger, channel chan *models.Submission,
-	services *eval.EvaluatorServices, sandboxManager eval.SandboxManager) *CompileHandler {
+	services *eval.CompileServices, sandboxManager eval.SandboxManager) *CompileHandler {
 	return &CompileHandler{
 		config: config,
 		logger: logger,

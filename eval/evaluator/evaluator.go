@@ -30,6 +30,7 @@ func (e *Evaluator) Serve() {
 	ticker := time.NewTicker(e.dbIterationTimeout)
 
 	go e.compileHandler.Handle(e.executeChannel)
+	go e.executeHandler.Handle(nil)
 
 	for range ticker.C {
 		submissions, err := e.services.SubmissionService.GetByFilter(context.Background(), waitingSubmissionFilter)
@@ -63,10 +64,10 @@ func New(dbIterationTimeout time.Duration, services *eval.EvaluatorServices, con
 
 	return &Evaluator{
 		compileChannel: compileChannel,
-		compileHandler: NewCompileHandler(config, logger, compileChannel, services, sandboxManager),
+		compileHandler: NewCompileHandler(config, logger, compileChannel, services.CompileServices(), sandboxManager),
 
 		executeChannel: executeChannel,
-		executeHandler: nil, // TODO
+		executeHandler: NewExecuteHandler(config, logger, executeChannel, services.ExecuteServices(), sandboxManager),
 
 		dbIterationTimeout: dbIterationTimeout,
 

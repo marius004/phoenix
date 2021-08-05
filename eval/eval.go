@@ -115,13 +115,47 @@ type ExecuteResponse struct {
 }
 
 type EvaluatorServices struct {
-	ProblemService    services.ProblemService
-	SubmissionService services.SubmissionService
-	TestService       services.TestService
+	ProblemService services.ProblemService
+	TestService    services.TestService
+
+	SubmissionService     services.SubmissionService
+	SubmissionTestService services.SubmissionTestService
 
 	TestManager managers.TestManager
 }
 
+type CompileServices struct {
+	SubmissionService services.SubmissionService
+}
+
+type ExecuteServices struct {
+	ProblemService services.ProblemService
+	TestService    services.TestService
+
+	SubmissionService     services.SubmissionService
+	SubmissionTestService services.SubmissionTestService
+
+	TestManager managers.TestManager
+}
+
+func (s *EvaluatorServices) CompileServices() *CompileServices {
+	return &CompileServices{
+		SubmissionService: s.SubmissionService,
+	}
+}
+
+func (s *EvaluatorServices) ExecuteServices() *ExecuteServices {
+	return &ExecuteServices{
+		ProblemService: s.ProblemService,
+		TestService:    s.TestService,
+
+		SubmissionService:     s.SubmissionService,
+		SubmissionTestService: s.SubmissionTestService,
+
+		TestManager: s.TestManager,
+	}
+}
+
 type Handler interface {
-	Handle(next chan *models.Submission) 
+	Handle(next chan *models.Submission)
 }
