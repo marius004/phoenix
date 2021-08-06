@@ -82,3 +82,7 @@ func ExecuteFile(ctx context.Context, sandbox Sandbox, lang models.Language, pro
 func GetBinaryName(config *models.Config, submissionId int) string {
 	return config.CompilePath + "/" + strconv.Itoa(submissionId) + ".bin"
 }
+
+func GetOutputFileName(config *models.Config, submission *models.Submission, test *models.Test) string {
+	return config.OutputPath + "/s" + strconv.Itoa(int(submission.Id)) + "t" + strconv.Itoa(int(test.Id)) + ".out"
+}

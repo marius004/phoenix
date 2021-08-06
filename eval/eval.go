@@ -79,7 +79,7 @@ type CompileRequest struct {
 }
 
 type CompileResponse struct {
-	Output  string
+	Message string
 	Success bool
 }
 
@@ -138,6 +138,16 @@ type ExecuteServices struct {
 	TestManager managers.TestManager
 }
 
+type CheckerServices struct {
+	ProblemService services.ProblemService
+	TestService    services.TestService
+
+	SubmissionService     services.SubmissionService
+	SubmissionTestService services.SubmissionTestService
+
+	TestManager managers.TestManager
+}
+
 func (s *EvaluatorServices) CompileServices() *CompileServices {
 	return &CompileServices{
 		SubmissionService: s.SubmissionService,
@@ -146,6 +156,18 @@ func (s *EvaluatorServices) CompileServices() *CompileServices {
 
 func (s *EvaluatorServices) ExecuteServices() *ExecuteServices {
 	return &ExecuteServices{
+		ProblemService: s.ProblemService,
+		TestService:    s.TestService,
+
+		SubmissionService:     s.SubmissionService,
+		SubmissionTestService: s.SubmissionTestService,
+
+		TestManager: s.TestManager,
+	}
+}
+
+func (s *EvaluatorServices) CheckerServices() *CheckerServices {
+	return &CheckerServices{
 		ProblemService: s.ProblemService,
 		TestService:    s.TestService,
 

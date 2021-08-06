@@ -24,9 +24,14 @@ type CompileHandler struct {
 
 func (handler *CompileHandler) Handle(next chan *models.Submission) {
 	for submission := range handler.submissions {
-
 		if err := handler.semaphore.Acquire(context.Background(), 1); err != nil {
 			handler.logger.Println(err)
+
+			updateSubmission := models.NewUpdateSubmissionRequest(0, models.Finished, "unknown evaluator error", &noError)
+			if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), updateSubmission); err != nil {
+				handler.logger.Println(err)
+			}
+
 			continue
 		}
 
@@ -38,18 +43,22 @@ func (handler *CompileHandler) Handle(next chan *models.Submission) {
 			compile := &tasks.CompileTask{
 				Config: handler.config,
 				Logger: handler.logger,
+
 				Request: &eval.CompileRequest{
 					ID:   int(submission.Id),
 					Lang: string(submission.Lang),
 					Code: []byte(submission.SourceCode),
 				},
+
 				Response: &eval.CompileResponse{},
 			}
 
 			// try to compile
 			if err := handler.sandboxManager.RunTask(context.Background(), compile); err != nil {
 				handler.logger.Println(err)
-				if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), UpdateSubmissionInternalErr(err.Error())); err != nil {
+
+				updateSubmission := models.NewUpdateSubmissionRequest(0, models.Finished, "evaluator error: "+err.Error(), &noError)
+				if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), updateSubmission); err != nil {
 					handler.logger.Println(err)
 					return
 				}
@@ -57,10 +66,12 @@ func (handler *CompileHandler) Handle(next chan *models.Submission) {
 
 			// compilation fail
 			if !compile.Response.Success {
-				if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), UpdateSubmissionErr(compile.Response.Output)); err != nil {
+				updateSubmission := models.NewUpdateSubmissionRequest(0, models.Finished, compile.Response.Message, &hasError)
+				if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), updateSubmission); err != nil {
 					handler.logger.Println(err)
-					return
 				}
+
+				return
 			}
 
 			// succesful compilation
@@ -69,7 +80,6 @@ func (handler *CompileHandler) Handle(next chan *models.Submission) {
 			if next != nil {
 				next <- submission
 			}
-
 		}(submission)
 	}
 }

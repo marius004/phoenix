@@ -10,10 +10,7 @@ import (
 
 type SubmissionLang string
 
-const (
-	C   = SubmissionLang("c")
-	Cpp = SubmissionLang("cpp")
-)
+const C = SubmissionLang("c")
 
 type SubmissionStatus string
 
@@ -24,14 +21,13 @@ const (
 )
 
 type Submission struct {
-	Id        uint64     `json:"id" db:"id"`
+	Id        uint64     `json:"id"`
 	CreatedAt *time.Time `json:"createdAt" db:"created_at"`
 
-	Score           int              `json:"score" db:"score"`
-	Lang            SubmissionLang   `json:"lang" db:"lang"`
-	Status          SubmissionStatus `json:"status" db:"status"`
-	CompileMessage  string           `json:"compileMessage" db:"compile_message"`
-	CompileError    string           `json:"compileError" db:"compile_error"`
+	Score           int              `json:"score"`
+	Lang            SubmissionLang   `json:"lang"`
+	Status          SubmissionStatus `json:"status"`
+	Message         string           `json:"message"`
 	HasCompileError *bool            `json:"hasCompileError" db:"has_compile_error"`
 
 	ProblemId  int    `json:"problemId" db:"problem_id"`
@@ -40,17 +36,25 @@ type Submission struct {
 }
 
 var (
-	submissionLangValidation       = []validation.Rule{validation.Required, validation.In(C, Cpp)}
+	submissionLangValidation       = []validation.Rule{validation.Required, validation.In(C)}
 	submissionProblemIdValidation  = []validation.Rule{validation.Required, validation.Min(0)}
 	submissionSourceCodeValidation = []validation.Rule{validation.Required, validation.Length(1, 0)}
 )
 
 type UpdateSubmissionRequest struct {
-	Score           int              `json:"score"`
-	Status          SubmissionStatus `json:"status"`
-	CompileMessage  string           `json:"compileMessage"`
-	CompileError    string           `json:"compileError"`
-	HasCompileError *bool            `json:"hasCompileError"`
+	Score           int
+	Status          SubmissionStatus
+	Message         string
+	HasCompileError *bool
+}
+
+func NewUpdateSubmissionRequest(score int, status SubmissionStatus, message string, compileError *bool) *UpdateSubmissionRequest {
+	return &UpdateSubmissionRequest{
+		Score:           score,
+		Status:          status,
+		Message:         message,
+		HasCompileError: compileError,
+	}
 }
 
 type CreateSubmissionRequest struct {

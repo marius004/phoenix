@@ -34,38 +34,37 @@ func (task *CompileTask) Run(ctx context.Context, sandbox eval.Sandbox) error {
 	task.Response.Success = true
 
 	if lang.IsCompiled {
-		output, err := eval.CompileFile(ctx, sandbox, task.Request.Code, lang)
-		task.Response.Output = output
+		message, err := eval.CompileFile(ctx, sandbox, task.Request.Code, lang)
+		task.Response.Message = message
 
 		if err != nil {
 			task.Response.Success = false
-			task.Response.Output = err.Error()
+			task.Response.Message = err.Error()
 			task.Logger.Printf("Could not compile %s\n", err.Error())
 			return err
-		} else if output != "" {
+		} else if task.Response.Message != "" {
 			task.Response.Success = false
-			task.Response.Output = output
 			return nil
 		}
 
 		file, err := os.OpenFile(binaryPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0664)
 
 		if err != nil {
-			task.Response.Output = err.Error()
+			task.Response.Message = err.Error()
 			task.Response.Success = false
 			task.Logger.Printf("Could not create the binary file %s\n", err.Error())
 			return err
 		}
 
 		if err := eval.CopyFromSandbox(sandbox, lang.Executable, file); err != nil {
-			task.Response.Output = err.Error()
+			task.Response.Message = err.Error()
 			task.Response.Success = false
 			task.Logger.Printf("Could not copy the binary file from sandbox %d %s\n", sandbox.GetID(), err.Error())
 			return err
 		}
 
 		if err := file.Close(); err != nil {
-			task.Response.Output = err.Error()
+			task.Response.Message = err.Error()
 			task.Response.Success = false
 			task.Logger.Printf("Could not close the binary file %s\n", err.Error())
 			return err

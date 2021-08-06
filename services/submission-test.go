@@ -12,4 +12,6 @@ type SubmissionTestService interface {
 	GetById(ctx context.Context, id uint64) (*models.SubmissionTest, error)
 
 	Create(ctx context.Context, submissionTest *models.SubmissionTest) error
+
+	Update(ctx context.Context, submissionId, testId uint64, submissionTest *models.UpdateSubmissionTestRequest) error
 }

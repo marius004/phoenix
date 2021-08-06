@@ -17,12 +17,17 @@ type SubmissionTest struct {
 	TestId       uint64 `json:"testId" db:"test_id"`
 }
 
-func NewSubmissionTest(score int, time float64, memory int, submissionId, userId, testId uint64) *SubmissionTest {
-	return &SubmissionTest{
-		Score:  score,
-		Time:   time,
-		Memory: memory,
+type UpdateSubmissionTestRequest struct {
+	Score  int     `json:"score"`
+	Time   float64 `json:"time"`
+	Memory int     `json:"memory"`
 
+	Message  string `json:"message"`
+	ExitCode int    `json:"exitCode" db:"exit_code"` // -1 == do not update
+}
+
+func NewSubmissionTest(submissionId, testId uint64) *SubmissionTest {
+	return &SubmissionTest{
 		SubmissionId: submissionId,
 		TestId:       testId,
 	}

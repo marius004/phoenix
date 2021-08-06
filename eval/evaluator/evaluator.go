@@ -18,6 +18,12 @@ type Evaluator struct {
 	executeHandler eval.Handler
 	executeChannel chan *models.Submission
 
+	checkerHandler eval.Handler
+	checkerChannel chan *models.Submission
+
+	finalizerHandler eval.Handler
+	finalizerChannel chan *models.Submission
+
 	dbIterationTimeout time.Duration
 	services           *eval.EvaluatorServices
 	sandboxManager     eval.SandboxManager
@@ -30,7 +36,9 @@ func (e *Evaluator) Serve() {
 	ticker := time.NewTicker(e.dbIterationTimeout)
 
 	go e.compileHandler.Handle(e.executeChannel)
-	go e.executeHandler.Handle(nil)
+	go e.executeHandler.Handle(e.checkerChannel)
+	go e.checkerHandler.Handle(e.finalizerChannel)
+	go e.finalizerHandler.Handle(nil)
 
 	for range ticker.C {
 		submissions, err := e.services.SubmissionService.GetByFilter(context.Background(), waitingSubmissionFilter)
@@ -58,8 +66,10 @@ func New(dbIterationTimeout time.Duration, services *eval.EvaluatorServices, con
 	sandboxManager := container.NewManager(config, logger)
 
 	var (
-		compileChannel = make(chan *models.Submission, config.MaxSandboxes)
-		executeChannel = make(chan *models.Submission, config.MaxSandboxes)
+		compileChannel   = make(chan *models.Submission, config.MaxCompile)
+		executeChannel   = make(chan *models.Submission, config.MaxExecute)
+		checkerChannel   = make(chan *models.Submission, config.MaxCheck)
+		finalizerChannel = make(chan *models.Submission, config.MaxExecute)
 	)
 
 	return &Evaluator{
@@ -68,6 +78,12 @@ func New(dbIterationTimeout time.Duration, services *eval.EvaluatorServices, con
 
 		executeChannel: executeChannel,
 		executeHandler: NewExecuteHandler(config, logger, executeChannel, services.ExecuteServices(), sandboxManager),
+
+		checkerHandler: NewCheckerHandler(config, logger, checkerChannel, services.CheckerServices()),
+		checkerChannel: checkerChannel,
+
+		finalizerHandler: NewFinalizeHandler(config, logger, finalizerChannel, services),
+		finalizerChannel: finalizerChannel,
 
 		dbIterationTimeout: dbIterationTimeout,
 

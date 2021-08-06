@@ -37,7 +37,7 @@ func UpdateSubmissionErr(message string) *models.UpdateSubmissionRequest {
 	return &models.UpdateSubmissionRequest{
 		Score:           0,
 		Status:          models.SubmissionStatus("finished"),
-		CompileMessage:  message,
+		Message:         message,
 		HasCompileError: &hasError,
 	}
 }
@@ -46,7 +46,7 @@ func UpdateSubmissionInternalErr(message string) *models.UpdateSubmissionRequest
 	return &models.UpdateSubmissionRequest{
 		Score:           0,
 		Status:          models.SubmissionStatus("finished"),
-		CompileMessage:  "Internal server error: " + message,
+		Message:         "Internal server error: " + message,
 		HasCompileError: &noError,
 	}
 }

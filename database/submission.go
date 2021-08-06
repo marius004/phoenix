@@ -6,8 +6,8 @@ import (
 	"log"
 	"strings"
 
-	"github.com/marius004/phoenix/models"
 	"github.com/jmoiron/sqlx"
+	"github.com/marius004/phoenix/models"
 )
 
 // SubmissionService implements services.SubmissionService
@@ -186,16 +186,12 @@ func (s *SubmissionService) updateQueryMaker(r *models.UpdateSubmissionRequest) 
 		query, args = append(query, "status = ?"), append(args, v)
 	}
 
-	if v := r.CompileMessage; v != "" {
-		query, args = append(query, "compile_message = ?"), append(args, v)
+	if v := r.Message; v != "" {
+		query, args = append(query, "message = ?"), append(args, v)
 	}
 
 	if v := r.HasCompileError; v != nil {
 		query, args = append(query, "has_compile_error = ?"), append(args, v)
-	}
-
-	if v := r.CompileError; v != "" {
-		query, args = append(query, "compile_error = ?"), append(args, v)
 	}
 
 	return query, args

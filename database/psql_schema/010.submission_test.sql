@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS submission_tests (
     time           float       NOT NULL DEFAULT 0,
     memory         int         NOT NULL DEFAULT 0,
     
-    message         text        NOT NULL,
+    message         text        NOT NULL DEFAULT '',
     exit_code       int         NOT NULL DEFAULT 0,
 
     submission_id   int         NOT NULL REFERENCES submissions(id) ON DELETE CASCADE,

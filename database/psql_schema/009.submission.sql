@@ -5,15 +5,11 @@ CREATE TABLE IF NOT EXISTS submissions (
     score           int         NOT NULL DEFAULT 0,
     lang            lang_type   NOT NULL,
     status          status_type NOT NULL DEFAULT 'waiting',
-    compile_message text        NOT NULL DEFAULT '',
-    compile_error   text        NOT NULL DEFAULT '',
+    message         text        NOT NULL DEFAULT '',
+    
+    source_code text NOT NULL DEFAULT '',
+    has_compile_error bool NOT NULL DEFAULT false,
 
     problem_id      int         NOT NULL REFERENCES problems(id) ON DELETE CASCADE,
     user_id         int         NOT NULL REFERENCES users(id) ON DELETE CASCADE
 );
-
-ALTER TABLE submissions 
-ADD COLUMN has_compile_error boolean;
-
-ALTER TABLE submissions
-ADD COLUMN source_code text NOT NULL DEFAULT '';

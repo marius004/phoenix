@@ -2,7 +2,9 @@ package database
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/marius004/phoenix/models"
@@ -53,6 +55,54 @@ func (s *SubmissionTestService) Create(ctx context.Context, tst *models.Submissi
 	}
 
 	return err
+}
+
+func (s *SubmissionTestService) Update(ctx context.Context, submissionId, testId uint64, update *models.UpdateSubmissionTestRequest) error {
+	queryList, args := s.updateQueryMaker(update)
+
+	if len(queryList) == 0 {
+		return nil
+	}
+
+	args = append(args, submissionId)
+	args = append(args, testId)
+
+	query := s.db.Rebind(fmt.Sprintf("UPDATE submission_tests SET %s WHERE submission_id = ? AND test_id = ?", strings.Join(queryList, ", ")))
+
+	_, err := s.db.ExecContext(ctx, query, args...)
+
+	if err != nil {
+		s.logger.Println(err)
+	}
+
+	return err
+}
+
+func (s *SubmissionTestService) updateQueryMaker(r *models.UpdateSubmissionTestRequest) ([]string, []interface{}) {
+	var query []string
+	var args []interface{}
+
+	if v := r.ExitCode; v != -1 {
+		query, args = append(query, "exit_code = ?"), append(args, v)
+	}
+
+	if v := r.Memory; v != -1 {
+		query, args = append(query, "memory = ?"), append(args, v)
+	}
+
+	if v := r.Time; v != -1 {
+		query, args = append(query, "time = ?"), append(args, v)
+	}
+
+	if v := r.Score; v != -1 {
+		query, args = append(query, "score = ?"), append(args, v)
+	}
+
+	if v := r.Message; v != "" {
+		query, args = append(query, "message = ?"), append(args, v)
+	}
+
+	return query, args
 }
 
 func NewSubmissionTestService(db *sqlx.DB, logger *log.Logger) *SubmissionTestService {

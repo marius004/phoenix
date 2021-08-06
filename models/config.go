@@ -12,8 +12,13 @@ type Command struct {
 }
 
 type Eval struct {
-	IsolatePath  string `json:"isolatePath"`
-	MaxSandboxes int    `json:"maxSandboxes"`
+	IsolatePath string `json:"isolatePath"`
+
+	// Concurrency stuff
+	MaxSandboxes int `json:"maxSandboxes"`
+	MaxCompile   int `json:"maxCompile"`
+	MaxExecute   int `json:"maxExecute"`
+	MaxCheck     int `json:"maxCheck"`
 
 	CompilePath string `json:"compilePath"`
 	OutputPath  string `json:"outputPath"`

@@ -94,59 +94,82 @@ func (handler *ExecuteHandler) createExecuteTask(submission *models.Submission, 
 
 func (handler *ExecuteHandler) Handle(next chan *models.Submission) {
 	for submission := range handler.submissions {
+		if err := handler.semaphore.Acquire(context.Background(), 1); err != nil {
+			handler.logger.Println(err)
 
-		handler.logger.Printf("Executing submission %d\n", submission.Id)
-		data := handler.getSubmissionData(submission)
-
-		if data.err != nil {
-			if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), UpdateSubmissionErr(data.internal.Error())); err != nil {
+			updateSubmission := models.NewUpdateSubmissionRequest(0, models.Finished, "unknown evaluator error", &noError)
+			if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), updateSubmission); err != nil {
 				handler.logger.Println(err)
 			}
+
 			continue
 		}
 
-		for _, test := range data.tests {
-			execute, err := handler.createExecuteTask(submission, data, test)
+		go func(submission *models.Submission) {
+			defer handler.semaphore.Release(1)
 
-			if err != nil {
-				handler.logger.Println(err)
-				if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), UpdateSubmissionErr(err.Error())); err != nil {
+			handler.logger.Printf("Executing submission %d\n", submission.Id)
+			data := handler.getSubmissionData(submission)
+
+			if data.err != nil {
+				updateSubmission := models.NewUpdateSubmissionRequest(0, models.Finished, "evaluator error: "+data.err.Error(), &noError)
+				if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), updateSubmission); err != nil {
 					handler.logger.Println(err)
 				}
-				continue
+				return
 			}
 
-			if err := handler.sandboxManager.RunTask(context.Background(), execute); err != nil {
-				if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), UpdateSubmissionErr(err.Error())); err != nil {
+			for _, test := range data.tests {
+				execute, err := handler.createExecuteTask(submission, data, test)
+
+				if err != nil {
 					handler.logger.Println(err)
-				}
-				continue
-			}
 
-			submissionTest := &models.SubmissionTest{
-				Time:   execute.Response.TimeUsed,
-				Memory: execute.Response.MemoryUsed,
+					submissionTest := models.NewSubmissionTest(submission.Id, test.Id)
+					submission.Message = "internal evaluator error: could not execute test"
 
-				Message:  execute.Response.Message,
-				ExitCode: execute.Response.ExitCode,
+					if err := handler.services.SubmissionTestService.Create(context.Background(), submissionTest); err != nil {
+						handler.logger.Println(err)
+					}
 
-				SubmissionId: uint64(execute.Request.SubmissionId),
-				TestId:       uint64(execute.Request.TestId),
-			}
-
-			if err := handler.services.SubmissionTestService.Create(context.Background(), submissionTest); err != nil {
-				handler.logger.Println(err)
-				if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), UpdateSubmissionErr(err.Error())); err != nil {
-					handler.logger.Println(err)
+					continue
 				}
 
-				continue
+				if err := handler.sandboxManager.RunTask(context.Background(), execute); err != nil {
+					handler.logger.Println(err)
+
+					submissionTest := models.NewSubmissionTest(submission.Id, test.Id)
+					submissionTest.Message = "internal evaluator error: could not execute test"
+
+					if err := handler.services.SubmissionTestService.Create(context.Background(), submissionTest); err != nil {
+						handler.logger.Println(err)
+					}
+
+					continue
+				}
+
+				submissionTest := &models.SubmissionTest{
+					Time:   execute.Response.TimeUsed,
+					Memory: execute.Response.MemoryUsed,
+
+					Message:  execute.Response.Message,
+					ExitCode: execute.Response.ExitCode,
+
+					SubmissionId: uint64(execute.Request.SubmissionId),
+					TestId:       uint64(execute.Request.TestId),
+				}
+
+				if err := handler.services.SubmissionTestService.Create(context.Background(), submissionTest); err != nil {
+					handler.logger.Println(err)
+					continue
+				}
 			}
 
 			if next != nil {
 				next <- submission
 			}
-		}
+
+		}(submission)
 	}
 }
 
@@ -157,7 +180,7 @@ func NewExecuteHandler(config *models.Config, logger *log.Logger, channel chan *
 		logger: logger,
 
 		submissions: channel,
-		semaphore:   semaphore.NewWeighted(int64(config.MaxSandboxes)),
+		semaphore:   semaphore.NewWeighted(int64(config.MaxExecute)),
 
 		services:       services,
 		sandboxManager: sandboxManager,
