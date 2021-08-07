@@ -14,6 +14,7 @@ const useStyles = makeStyles(styles);
 
 export default function HeaderLinks(props) {
   const classes  = useStyles();
+  console.log(authenticationService)
   const authToken = authenticationService.getAuthToken();
 
   const handleLogout = async() => {

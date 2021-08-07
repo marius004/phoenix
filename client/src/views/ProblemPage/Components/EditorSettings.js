@@ -24,18 +24,6 @@ export default function EditorSettings(props) {
                   buttonProps={{color: "warning"}}
                   buttonStyle={{diplay: "inline-block"}}
                   dropdownList={[
-                    <span className={classes.dropdownLink} onClick={() => setFontSize(14)}>
-                        14
-                    </span>, {divider: true},
-                    <span className={classes.dropdownLink} onClick={() => setFontSize(15)}>
-                        15
-                    </span>, {divider: true},
-                    <span className={classes.dropdownLink} onClick={() => setFontSize(16)}>
-                        16
-                    </span>, {divider: true},
-                    <span className={classes.dropdownLink} onClick={() => setFontSize(17)}>
-                        17
-                    </span>, {divider: true},
                     <span className={classes.dropdownLink} onClick={() => setFontSize(18)}>
                         18
                     </span>, {divider: true},
@@ -56,22 +44,20 @@ export default function EditorSettings(props) {
             </GridItem>
             <GridItem xl={4} lg={4} sm={4}>
                 <CustomDropdown
-                  buttonText="Limbaj"
+                  buttonText="Programming Language"
                   buttonProps={{color: "info"}}
                   buttonStyle={{diplay: "inline-block"}}
                   dropdownList={[
-                    <span className={classes.dropdownLink} onClick={() => setLang("cpp")}>
-                        C++
-                    </span>,{divider: true},
                     <span className={classes.dropdownLink} onClick={() => setLang("c")}>
-                        C
+                        C 
                     </span>,
                   ]}
                 />
             </GridItem>
             <GridItem xl={4} lg={4} sm={4}>
+                {/* TODO ENGLEZIFICARE */}
                 <CustomDropdown
-                  buttonText="Culoare"
+                  buttonText="Background"
                   buttonProps={{color: "success"}}
                   buttonStyle={{diplay: "inline-block"}}
                   dropdownList={[

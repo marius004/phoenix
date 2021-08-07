@@ -7,7 +7,7 @@ const problemService = {
     get,
 };
 
-const get = (queryArgs) => {
+function get(queryArgs) {
     return axios.get(`${config.apiUrl}/problems?${queryArgs}`);
 }
 

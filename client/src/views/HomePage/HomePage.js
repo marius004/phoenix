@@ -9,27 +9,11 @@ import Parallax from "components/Parallax/Parallax.js";
 import styles from "assets/jss/material-kit-react/views/components.js";
 import SectionFeatures from "./Sections/SectionCards.js";
 import Navbar from "components/Navbar/Navbar.js";
-import axios from "axios";
-import config from "config";
 
 const useStyles = makeStyles(styles);
 
 export default function Components() {
   const classes = useStyles();
-
-
-const updateProblem = () => {
-  return axios.post(`${config.apiUrl}/submissions`, {
-    "lang": "c",
-    "problemId": 1,
-    "sourceCode": `#include <stdio.h>\nint main() {\nint number1, number2, sum;\n scanf("%d %d", &number1, &number2);\n sum = number1 + number2; printf("%d", sum); return 0;\n}\n`
-  }, config.cors)
-}
-
-
-  useEffect(async() => {
-    await updateProblem();
-  }, [])
 
   return (
     <div>
@@ -55,7 +39,6 @@ const updateProblem = () => {
       <div className={classNames(classes.main, classes.mainRaised)}>
         <SectionFeatures/>
       </div>
-
       <Footer />
     </div>
   );

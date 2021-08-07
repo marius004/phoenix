@@ -86,8 +86,7 @@ export default function SignupDialog(props) {
         onSubmit: async (values) => {
           try {
             await authenticationService.signup(values.username, values.password,  values.email);
-            clear();
-            props.onSignup();
+            window.location.reload()
           } catch(err) {
             let message = err.response.data.message;
             setSignupErr(message);

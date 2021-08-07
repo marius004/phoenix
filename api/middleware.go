@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -24,6 +25,8 @@ func (s *API) MustNotBeAuthed(next http.Handler) http.Handler {
 // MustBeAuthed is a middleware that makes sure that the user creating the request is authenticated.
 func (s *API) MustBeAuthed(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user := util.UserFromRequestContext(r)
+		fmt.Println(user)
 		if !util.IsRAuthed(r) {
 			util.ErrorResponse(w, http.StatusUnauthorized, "You must be logged in to do this", s.logger)
 			return

@@ -24,13 +24,6 @@ const ProblemSetPage = () => {
         console.log(query.get("grade"))
     }, []);
 
-    // TODO
-    const getQueryFilters = () => {
-        return {
-            grade: query.get("grade"),
-        };
-    }
-
     const fetchProblems = async () => {
         try {
             const res = await problemService.getAll();

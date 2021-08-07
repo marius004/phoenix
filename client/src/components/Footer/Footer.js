@@ -60,10 +60,6 @@ export default function Footer(props) {
             </ListItem>
           </List>
         </div>
-        <div className={classes.right}>
-          &copy; {1900 + new Date().getYear()}, {"  "} made by {"  "}
-           <a className={classes.inlineBlock} href="https://github.com/PhoenixAlgo" target="_blank"> Phoenix Team</a>
-        </div>
       </div>
     </footer>
   );

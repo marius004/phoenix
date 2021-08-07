@@ -67,11 +67,9 @@ export default function LoginDialog(props) {
         },
         validationSchema: validationSchema,
         onSubmit: async (values) => {
-          console.log(values)
           try {
             await authenticationService.login(values.username, values.password);
-            clear();
-            props.onLogin();
+            window.location.reload()
           } catch(err) {
             let message = err.response.data.message;
             setLoginErr(message);

@@ -45,5 +45,4 @@ function isLoggedIn() {
     return authToken != null && authToken.token != null;
 }
 
-
 export default authenticationService;
