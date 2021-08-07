@@ -9,7 +9,7 @@
   - [ ] add the possibility to make a user admin or proposer.
   - [x] test manager.
   - [ ] re-evaluate submissions functionality for admins
-  - [ ] code evaluator. 
+  - [x] code evaluator. 
   - [ ] recover account in case of forgotten password.
   - [ ] user verification.
   - [ ] "newsletter"??
