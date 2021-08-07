@@ -73,6 +73,7 @@ func (s *API) Routes() http.Handler {
 	r.Route("/users", func(r chi.Router) {
 		r.With(s.MustBeAdmin).Get("/", s.GetAllUsers)
 		r.Get("/{userName}", s.GetUserByUserName)
+		r.Get("/{userId}/gravatar", s.GetUserGravatar)
 	})
 
 	r.Route("/auth", func(r chi.Router) {
