@@ -67,6 +67,8 @@ const ProblemSubmissions = ({ problem }) => {
     }
 
     const submissionStatus = (submission) => {
+        if(submission.status == "working")
+            return "Evaluating"
         if (submission.hasCompileError)
             return "Compile Error";
         if (submission.score === 100)
@@ -76,6 +78,9 @@ const ProblemSubmissions = ({ problem }) => {
 
     // COLORS TAKEN FROM: https://materializecss.com/color.html
     const submissionRowColor = (submission) => {
+        if(submission.status == "working")
+            return {backgroundColor: "#64b5f6"}
+
         if (submission.score == 0)
             return {backgroundColor: "#b71c1c"}; // red darken-4
         if (submission.score <= 30)
@@ -111,7 +116,7 @@ const ProblemSubmissions = ({ problem }) => {
                             <TableCell component="th" scope="row">{row.id}</TableCell>
                             <TableCell>{row.createdAt}</TableCell>
                             <TableCell>{submissionStatus(row)}</TableCell>
-                            <TableCell align="right">{row.score}</TableCell>
+                            <TableCell align="right">{row.status == "working" ? "N/A" : row.score}</TableCell>
                         </TableRow>
                     ))}
                     </TableBody>

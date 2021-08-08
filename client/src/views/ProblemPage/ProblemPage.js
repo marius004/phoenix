@@ -24,6 +24,7 @@ import Loading from "views/Loading";
 const ProblemPage = () => {
     
     const [loading, setLoading] = useState(true);
+    const [submissionId, setSubmissionId] = useState(-1);
     const [fetchingStatus, setFetchingStatus] = useState(200);
     const { problemName } = useParams();
     const [problem, setProblem] = useState({})
@@ -52,12 +53,52 @@ const ProblemPage = () => {
         }
     }
 
-    // TODO submissions that have not been evaluated
-    // should be shown on the ui with a "not evaluated yet" message 
+    useEffect(() => {
+        if (submissionId < 0)
+            return;
 
+        const timer = setInterval(async() => {
+            console.log("iterating...")
+            if (submissionId < 0)
+                return;
+
+            const res = await evaluatorService.getSubmission(submissionId);
+
+            if (res.data.status === "finished") {
+                const config = {
+                    fontSize: 30,
+                    position: "bottom-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: false,
+                    progress: undefined,
+                }
+                if (res.data.score === 100) {
+                    toast.success(<p>Submission #{submissionId} evaluated <br/> Score: {res.data.score}</p>, config);
+                } else if(res.data.score >= 50) {
+                    toast.warning(<p>Submission #{submissionId} evaluated <br/> Score: {res.data.score}</p>, config);
+                } else {
+                    toast.error(<p>Submission #{submissionId} evaluated <br/> Score: {res.data.score}</p>, config);
+                }
+
+                clearInterval(timer);
+                setSubmissionId(-1);
+            }
+            
+        }, 2000) 
+
+        return () => {
+            clearInterval(timer);
+        }
+    }, [submissionId])
+       
     const handleCodeSubmission = async() => {
         try {
-            await evaluatorService.createSubmission(code, lang, problem.id);
+            const res = await evaluatorService.createSubmission(code, lang, problem.id);
+            setSubmissionId(res.data.id);
+            
             toast.info("Submission Sent", {
                 fontSize: 30,
                 position: "bottom-right",

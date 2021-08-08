@@ -56,5 +56,5 @@ func (s *API) CreateSubmission(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	util.EmptyResponse(w, http.StatusOK)
+	util.DataResponse(w, http.StatusCreated, submission, s.logger)
 }

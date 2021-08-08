@@ -12,6 +12,7 @@ import ProfilePage from "views/ProfilePage/ProfilePage";
 
 var hist = createBrowserHistory();
 
+// https://stackoverflow.com/questions/35352638/react-how-to-get-parameter-value-from-query-string
 ReactDOM.render(
   <Router history={hist}>
     <Switch>
