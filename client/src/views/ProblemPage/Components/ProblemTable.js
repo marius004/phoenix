@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -8,27 +8,36 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import PropTypes from "prop-types";
+import userService from 'services/user.service';
 
 const useStyles = makeStyles({
-  table: {
-    minWidth: 650,
-  },
+  gravatar: {
+    borderRadius: "50%"
+  }
 });
-
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-];
 
 export default function ProblemTable({ data }) {
   const classes = useStyles();
+  const [gravatarData, setGravatarData] = useState({})
+
+  const fetchGravatarData = async() => {
+    try {
+      const res = await userService.getGravatarEmailHash(data.authorId);
+      setGravatarData(res.data);
+    } catch(err) {
+      console.error(err);
+    }
+  }
+
+  const getGravatarURI = (imgSize) => {
+    return `https://www.gravatar.com/avatar/${gravatarData.emailHash}?s=${imgSize}`;
+  }
+
+  useEffect(fetchGravatarData, [])
 
   return (
     <TableContainer component={Paper} style={{marginBottom: "20px"}}>
-      <Table className={classes.table} aria-label="simple table">
+      <Table aria-label="simple table">
         <TableHead>
           <TableRow>
             <TableCell>Posted by</TableCell>
@@ -42,8 +51,10 @@ export default function ProblemTable({ data }) {
         </TableHead>
         <TableBody>
         <TableRow key={data.id}>
-            {/* TODO */}
-            <TableCell component="th" scope="row">User Id {data.authorId}</TableCell>
+            <TableCell component="th" scope="row">
+              <img className={classes.gravatar} src={getGravatarURI(22)}/>
+              {"  "}{gravatarData.username} 
+            </TableCell>
             <TableCell align="right">{data.grade}</TableCell>
             <TableCell align="right">{data.stream}</TableCell>
             <TableCell align="right">{data.timeLimit} s</TableCell>
@@ -58,5 +69,5 @@ export default function ProblemTable({ data }) {
 }
 
 ProblemTable.prototype = {
-    data: PropTypes.object.isRequired
+  data: PropTypes.object.isRequired
 }

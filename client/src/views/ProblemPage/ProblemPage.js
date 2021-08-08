@@ -19,6 +19,7 @@ import { ToastContainer, toast } from 'react-toastify';
 
 import evaluatorService from "services/evaluator.service";
 import authenticationService from "services/authentication.service";
+import Loading from "views/Loading";
 
 const ProblemPage = () => {
     
@@ -44,13 +45,15 @@ const ProblemPage = () => {
         try {
             const res = await problemService.getByName(problemName);
             setProblem(res.data);
-            console.log(res.data);
         } catch (err) {
           console.error(err);
         } finally {
             setLoading(false);
         }
     }
+
+    // TODO submissions that have not been evaluated
+    // should be shown on the ui with a "not evaluated yet" message 
 
     const handleCodeSubmission = async() => {
         try {
@@ -66,11 +69,15 @@ const ProblemPage = () => {
                 progress: undefined,
             });
         } catch(err) {
-            console.error(err)
+            console.error(err);
         }
     }
 
     useEffect(fetchProblem, []);
+
+    if (loading) {
+        return <Loading/>
+    }
 
     return (
         <div>

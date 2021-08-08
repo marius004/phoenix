@@ -40,7 +40,6 @@ const ProblemSubmissions = ({ problem }) => {
             const res = await evaluatorService.getSubmissions(userId, problem.id);
             let submissions = res.data;
             
-            // sorting in descending order by id
             submissions.sort((a, b) => b.id - a.id);
 
             setSubmissions(submissions);
