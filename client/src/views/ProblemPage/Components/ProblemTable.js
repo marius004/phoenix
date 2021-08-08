@@ -9,6 +9,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import PropTypes from "prop-types";
 import userService from 'services/user.service';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles({
   gravatar: {
@@ -52,8 +53,10 @@ export default function ProblemTable({ data }) {
         <TableBody>
         <TableRow key={data.id}>
             <TableCell component="th" scope="row">
-              <img className={classes.gravatar} src={getGravatarURI(22)}/>
-              {"  "}{gravatarData.username} 
+              <Link to={() => `/profile/${gravatarData.username}`} style={{color: "blue"}}>
+                <img className={classes.gravatar} src={getGravatarURI(22)}/>
+                {"  "}{gravatarData.username} 
+              </Link>
             </TableCell>
             <TableCell align="right">{data.grade}</TableCell>
             <TableCell align="right">{data.stream}</TableCell>

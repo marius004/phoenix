@@ -9,6 +9,7 @@ import Button from "components/CustomButtons/Button.js";
 import styles from "assets/jss/material-kit-react/components/headerLinksStyle.js";
 import MenuBookIcon from '@material-ui/icons/MenuBook';
 import authenticationService from "services/authentication.service";
+import userService from "services/user.service";
 
 const useStyles = makeStyles(styles);
 
@@ -20,6 +21,11 @@ export default function HeaderLinks(props) {
   const handleLogout = async() => {
     await authenticationService.logout();
     window.location.reload();
+  }
+
+  const getUserProfileLink = () => {
+    const user = userService.getUser();
+    return `/profile/${user.username}`
   }
 
   return (
@@ -34,7 +40,6 @@ export default function HeaderLinks(props) {
           }}
           buttonIcon={Apps}
           dropdownList={[
-            // TODO
             <Link to="/problems" className={classes.dropdownLink}>
               <a href="" className={classes.dropdownLink}>
                Toate 
@@ -89,11 +94,6 @@ export default function HeaderLinks(props) {
                 Web Development
               </a>
             </Link>,
-            <Link to="/" className={classes.dropdownLink}>
-              <a href="" className={classes.dropdownLink}>
-                Mobile Development
-              </a>
-            </Link>,
           ]}
         />
       </ListItem>
@@ -127,13 +127,14 @@ export default function HeaderLinks(props) {
           }}
           buttonIcon={PermIdentity}
           dropdownList={[
-            // TODO
-            <ListItem className={classes.listItem}>
-              <Button className={classes.dropdownLink} style={{ paddingLeft: "8px", paddingRight: "8px"}} color="transparent">
-                <i style={{ fontSize: "18px", marginRight: "4px" }} className="fa fa-user" aria-hidden="true"></i>
-                Profile
-              </Button>
-            </ListItem>,
+            <Link to={getUserProfileLink()} className={classes.dropdownLink}>
+              <ListItem className={classes.listItem}>
+                <Button className={classes.dropdownLink} style={{ paddingLeft: "8px", paddingRight: "8px"}} color="transparent">
+                  <i style={{ fontSize: "18px", marginRight: "4px" }} className="fa fa-user" aria-hidden="true"></i>
+                  Profile
+                </Button>
+              </ListItem>
+            </Link>,
             <ListItem className={classes.listItem}>
               <Button className={classes.dropdownLink} style={{ paddingLeft: "8px", paddingRight: "8px"}} color="transparent" onClick={() => handleLogout()}>
                 <i style={{ fontSize: "18px", marginRight: "4px" }} className="fa fa-sign-out"></i>

@@ -21,16 +21,6 @@ func (s *API) GetUserByUserName(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if util.IsRAdmin(r) {
-		util.DataResponse(w, http.StatusOK, user, s.logger)
-		return
-	}
-
-	if !user.Visible {
-		util.ErrorResponse(w, http.StatusBadRequest, "The page of the requested user is not visible", s.logger)
-		return
-	}
-
 	util.DataResponse(w, http.StatusOK, user, s.logger)
 }
 
