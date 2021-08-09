@@ -1,6 +1,7 @@
 ## TODO:
 
 - Priorities: 
+  - [ ] eval change: problems that do not read input from stdin, but from files
   - [x] problem service.
   - [x] get rid of the "singleton" logger.
   - [ ] problem tag and category
