@@ -67,10 +67,12 @@ const ProblemSubmissions = ({ problem }) => {
     }
 
     const submissionStatus = (submission) => {
+        if (submission.status == "waiting")
+            return "Waiting";
         if(submission.status == "working")
-            return "Evaluating"
+            return "Evaluating";
         if (submission.hasCompileError)
-            return "Compile Error";
+            return "Compilation Error";
         if (submission.score === 100)
             return "Accepted";
         return "Not accepted";
@@ -80,6 +82,9 @@ const ProblemSubmissions = ({ problem }) => {
     const submissionRowColor = (submission) => {
         if(submission.status == "working")
             return {backgroundColor: "#64b5f6"}
+
+        if (submission.status == "waiting")
+            return {backgroundColor: "#dce775"}
 
         if (submission.score == 0)
             return {backgroundColor: "#b71c1c"}; // red darken-4
@@ -96,6 +101,12 @@ const ProblemSubmissions = ({ problem }) => {
             return {backgroundColor: "#ffb74d"}; // orange lighten-4
         
         return {backgroundColor: "#388e3c"}; // green darken-2
+    }
+
+    const submissionScore = (submission) => {
+        if(submission.status == "working" || submission.status == "waiting")
+            return "N/A";
+        return submission.score;
     }
 
     return (
@@ -116,7 +127,7 @@ const ProblemSubmissions = ({ problem }) => {
                             <TableCell component="th" scope="row">{row.id}</TableCell>
                             <TableCell>{row.createdAt}</TableCell>
                             <TableCell>{submissionStatus(row)}</TableCell>
-                            <TableCell align="right">{row.status == "working" ? "N/A" : row.score}</TableCell>
+                            <TableCell align="right">{submissionScore(row)}</TableCell>
                         </TableRow>
                     ))}
                     </TableBody>

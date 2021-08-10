@@ -6,21 +6,22 @@ import "assets/scss/material-kit-react.scss";
 import ProblemPage from "views/ProblemPage/ProblemPage.js";
 import HomePage from "views/HomePage/HomePage.js";
 import ProblemSetPage from "views/ProblemSetPage/ProblemSetPage";
-import NotFound from "views/NotFound";
+import NotFound from "views/Components/NotFound";
 import 'react-toastify/dist/ReactToastify.css';
 import ProfilePage from "views/ProfilePage/ProfilePage";
+import SubmissionsPage from "views/SubmissionsPage/SubmissionsPage";
 
 var hist = createBrowserHistory();
 
-// https://stackoverflow.com/questions/35352638/react-how-to-get-parameter-value-from-query-string
 ReactDOM.render(
   <Router history={hist}>
     <Switch>
       <Route exact path="/" component={HomePage} />
-      <Route exact path="/problems/:problemName" component={ProblemPage} />
-      <Route exact path="/profile/:username" component={ProfilePage} />
-      <Route exact path="/problems" component={ProblemSetPage}/>
-      <Route exact path="*"component={NotFound} />
+      <Route path="/problems/:problemName" component={ProblemPage} />
+      <Route path="/profile/:username" component={ProfilePage} />
+      <Route path="/problems" component={ProblemSetPage}/>
+      <Route path="/submissions" component={SubmissionsPage} />
+      <Route path="*"component={NotFound} />
     </Switch>
   </Router>,
   document.getElementById("root")

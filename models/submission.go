@@ -1,8 +1,6 @@
 package models
 
 import (
-	"net/http"
-	"strconv"
 	"time"
 
 	validation "github.com/go-ozzo/ozzo-validation"
@@ -33,6 +31,12 @@ type Submission struct {
 	ProblemId  int    `json:"problemId" db:"problem_id"`
 	UserId     int    `json:"userId" db:"user_id"`
 	SourceCode string `json:"sourceCode" db:"source_code"`
+
+	// I know it is not a good practice to do something like this
+	// but I hope I will restructure this in the future
+	Username    string `json:"username"`
+	EmailHash   string `json:"emailHash"`
+	ProblemName string `json:"problemName"`
 }
 
 var (
@@ -78,6 +82,9 @@ type SubmissionFilter struct {
 	Langs        []SubmissionLang
 	Statuses     []SubmissionStatus
 	CompileError *bool // nil == skip(does not matter), false no compile error, true compile errors
+
+	Limit  int
+	Offset int
 }
 
 func NewSubmission(request CreateSubmissionRequest, userId int) *Submission {
@@ -87,48 +94,4 @@ func NewSubmission(request CreateSubmissionRequest, userId int) *Submission {
 		UserId:     userId,
 		SourceCode: string(request.SourceCode),
 	}
-}
-
-func ParseSubmissionFilter(r *http.Request) *SubmissionFilter {
-	ret := SubmissionFilter{}
-
-	if v, ok := r.URL.Query()["userId"]; ok {
-		last := len(v) - 1
-		if val, err := strconv.Atoi(v[last]); err == nil {
-			ret.UserId = val
-		}
-	}
-
-	if v, ok := r.URL.Query()["lang"]; ok {
-		ret.Langs = convertUrlValuesToLangArr(v)
-	}
-
-	if v, ok := r.URL.Query()["problemId"]; ok {
-		last := len(v) - 1
-		if val, err := strconv.Atoi(v[last]); err == nil {
-			ret.ProblemId = val
-		}
-	}
-
-	if v, ok := r.URL.Query()["score"]; ok {
-		last := len(v) - 1
-		if val, err := strconv.Atoi(v[last]); err == nil {
-			ret.Score = val
-		}
-	} else {
-		ret.Score = -1
-	}
-
-	if v, ok := r.URL.Query()["status"]; ok {
-		ret.Statuses = convertUrlValuesToStatusArr(v)
-	}
-
-	if v, ok := r.URL.Query()["compileError"]; ok {
-		last := len(v) - 1
-		if val, err := strconv.ParseBool(v[last]); err == nil {
-			ret.CompileError = &val
-		}
-	}
-
-	return &ret
 }

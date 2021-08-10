@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/marius004/phoenix/models"
@@ -98,4 +99,36 @@ func encodeToBase64(data interface{}) string {
 	}
 
 	return base64.StdEncoding.EncodeToString(json)
+}
+
+func convertUrlValuesToInt(values []string) []int {
+	ret := make([]int, 0)
+
+	for _, str := range values {
+		if val, err := strconv.Atoi(str); err != nil {
+			ret = append(ret, val)
+		}
+	}
+
+	return ret
+}
+
+func convertUrlValuesToLangArr(values []string) []models.SubmissionLang {
+	langs := make([]models.SubmissionLang, len(values))
+
+	for ind, val := range values {
+		langs[ind] = models.SubmissionLang(val)
+	}
+
+	return langs
+}
+
+func convertUrlValuesToStatusArr(values []string) []models.SubmissionStatus {
+	statuses := make([]models.SubmissionStatus, len(values))
+
+	for ind, val := range values {
+		statuses[ind] = models.SubmissionStatus(val)
+	}
+
+	return statuses
 }

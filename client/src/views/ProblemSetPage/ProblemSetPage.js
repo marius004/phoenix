@@ -7,7 +7,7 @@ import styles from "assets/jss/material-kit-react/views/components.js";
 import problemService from "services/problem.service";
 import Problems from "views/Components/Problems";
 import Footer from "components/Footer/Footer";
-import Loading from "views/Loading";
+import Loading from "views/Components/Loading";
 
 const useStyles = makeStyles(styles);
 

@@ -14,7 +14,7 @@ import (
 // params available: authorId(int), Difficulty(string),
 // credits(string), stream(string)
 func (s *API) GetProblems(w http.ResponseWriter, r *http.Request) {
-	filter := models.ParseProblemFilter(r)
+	filter := s.parseProblemFilter(r)
 	problems, err := s.problemService.GetByFilter(r.Context(), filter)
 
 	if err != nil {
@@ -126,4 +126,30 @@ func (s *API) DeleteByName(w http.ResponseWriter, r *http.Request) {
 	}
 
 	util.EmptyResponse(w, http.StatusOK)
+}
+
+func (s *API) parseProblemFilter(r *http.Request) *models.ProblemFilter {
+	ret := models.ProblemFilter{}
+
+	if v, ok := r.URL.Query()["authorId"]; ok {
+		ret.AuthorsId = convertUrlValuesToInt(v)
+	}
+
+	if v, ok := r.URL.Query()["difficulty"]; ok {
+		ret.Difficulties = v
+	}
+
+	if v, ok := r.URL.Query()["credits"]; ok {
+		ret.Credits = v
+	}
+
+	if v, ok := r.URL.Query()["stream"]; ok {
+		ret.Stream = v
+	}
+
+	if v, ok := r.URL.Query()["grade"]; ok {
+		ret.Grades = v
+	}
+
+	return &ret
 }

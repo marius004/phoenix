@@ -15,7 +15,6 @@ const useStyles = makeStyles(styles);
 
 export default function HeaderLinks(props) {
   const classes  = useStyles();
-  console.log(authenticationService)
   const authToken = authenticationService.getAuthToken();
 
   const handleLogout = async() => {
@@ -65,13 +64,13 @@ export default function HeaderLinks(props) {
                Concursuri
              </a>
             </Link>,
-            <Link to="/" className={classes.dropdownLink}>
-              <a href="" className={classes.dropdownLink}>
-                Bacalaureat
-              </a>
-            </Link>,
           ]}
         />
+      </ListItem>
+      <ListItem className={classes.listItem}>
+        <Link to="/submissions" className={classes.navLink}>
+            Submissions
+        </Link>
       </ListItem>
       <ListItem className={classes.listItem}>
         <CustomDropdown

@@ -43,6 +43,7 @@ export default function ProblemTable({ data }) {
           <TableRow>
             <TableCell>Posted by</TableCell>
             <TableCell align="right">Grade</TableCell>
+            <TableCell align="right">ID</TableCell>
             <TableCell align="right">Input/Output</TableCell>
             <TableCell align="right">Time Limit</TableCell>
             <TableCell align="right">Memory Limit</TableCell>
@@ -59,6 +60,7 @@ export default function ProblemTable({ data }) {
               </Link>
             </TableCell>
             <TableCell align="right">{data.grade}</TableCell>
+            <TableCell align="right">{data.id}</TableCell>
             <TableCell align="right">{data.stream}</TableCell>
             <TableCell align="right">{data.timeLimit} s</TableCell>
             <TableCell align="right">{data.memoryLimit} KB</TableCell>

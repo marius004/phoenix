@@ -133,7 +133,7 @@ export default function LoginDialog(props) {
                 <TextField
                 style={{marginTop: "3px", padding: "2px"}}
                 fullWidth
-                id="username"
+                id="login-username"
                 name="username"
                 label="Username"
                 value={formik.values.username}
@@ -144,7 +144,7 @@ export default function LoginDialog(props) {
                 <TextField
                 style={{marginTop: "3px", padding: "2px"}}
                 fullWidth
-                id="password"
+                id="login-password"
                 name="password"
                 label="Password"
                 type="password"
@@ -158,7 +158,6 @@ export default function LoginDialog(props) {
                     color="rose" round type="submit">
                     Autentificare
                 </Button>
-                
             </form>
         </DialogContent>
       </Dialog>  

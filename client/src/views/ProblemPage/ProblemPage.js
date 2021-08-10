@@ -19,7 +19,7 @@ import { ToastContainer, toast } from 'react-toastify';
 
 import evaluatorService from "services/evaluator.service";
 import authenticationService from "services/authentication.service";
-import Loading from "views/Loading";
+import Loading from "views/Components/Loading";
 
 const ProblemPage = () => {
     

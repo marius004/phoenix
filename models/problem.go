@@ -1,7 +1,6 @@
 package models
 
 import (
-	"net/http"
 	"time"
 
 	validation "github.com/go-ozzo/ozzo-validation"
@@ -145,30 +144,4 @@ func NewProblem(request CreateProblemRequest) *Problem {
 		StackLimit:  request.StackLimit,
 		SourceSize:  request.SourceSize,
 	}
-}
-
-func ParseProblemFilter(r *http.Request) *ProblemFilter {
-	ret := ProblemFilter{}
-
-	if v, ok := r.URL.Query()["authorId"]; ok {
-		ret.AuthorsId = convertUrlValuesToInt(v)
-	}
-
-	if v, ok := r.URL.Query()["difficulty"]; ok {
-		ret.Difficulties = v
-	}
-
-	if v, ok := r.URL.Query()["credits"]; ok {
-		ret.Credits = v
-	}
-
-	if v, ok := r.URL.Query()["stream"]; ok {
-		ret.Stream = v
-	}
-
-	if v, ok := r.URL.Query()["grade"]; ok {
-		ret.Grades = v
-	}
-
-	return &ret
 }

@@ -23,17 +23,18 @@ const (
 
 func (s *SubmissionService) GetByFilter(ctx context.Context, filter *models.SubmissionFilter) ([]*models.Submission, error) {
 	var submissions []*models.Submission
+	var query string
+
 	queryList, args := s.filterMaker(filter)
 
 	if len(queryList) == 0 {
-		if err := s.db.Select(&submissions, "SELECT * FROM submissions"); err != nil {
-			return nil, err
-		}
-		return submissions, nil
+		query = s.db.Rebind(fmt.Sprintf("SELECT * FROM submissions ORDER BY id DESC LIMIT %d OFFSET %d", filter.Limit, filter.Offset))
+	} else {
+		query = s.db.Rebind(fmt.Sprintf("SELECT * FROM submissions WHERE %s ORDER BY id DESC LIMIT %d OFFSET %d", strings.Join(queryList, " AND "), filter.Limit, filter.Offset))
 	}
 
-	query := s.db.Rebind(fmt.Sprintf("SELECT * FROM submissions WHERE %s", strings.Join(queryList, " AND ")))
 	if err := s.db.Select(&submissions, query, args...); err != nil {
+		s.logger.Println(err)
 		return nil, err
 	}
 
@@ -133,7 +134,7 @@ func (s *SubmissionService) filterMaker(filter *models.SubmissionFilter) ([]stri
 		query, args = append(query, "problem_id = ?"), append(args, v)
 	}
 
-	if v := filter.Score; v > 0 {
+	if v := filter.Score; v >= 0 {
 		query, args = append(query, "score = ?"), append(args, v)
 	}
 
@@ -169,6 +170,14 @@ func (s *SubmissionService) filterMaker(filter *models.SubmissionFilter) ([]stri
 
 	if v := filter.CompileError; v != nil {
 		query, args = append(query, "has_compile_error = ?"), append(args, v)
+	}
+
+	if filter.Limit <= 0 {
+		filter.Limit = (1 << 30)
+	}
+
+	if filter.Offset <= 0 {
+		filter.Offset = 0
 	}
 
 	return query, args

@@ -1,63 +1,32 @@
-// import React, {useEffect} from "react";
-// import {useParams} from "react-router-dom";
-// import userService from "services/user.service";
-
-// export default function ProfilePage() {
-//     const { username } = useParams();
-
-//     const fetchUser = async() => {
-//         try {
-//             const res = await userService.getByUserName(username);
-//             console.log(res.data);
-//         } catch(err) {
-//             console.error(err.response.data.message);
-//         }
-//     }
-
-//     useEffect(fetchUser, []);
-
-//     return (
-//         <div>
-          
-//         </div>    
-//     )
-// }
-
 import React, {useState, useEffect} from "react";
 import {useParams} from "react-router-dom";
 import classNames from "classnames";
 import { makeStyles } from "@material-ui/core/styles";
 
 import Footer from "components/Footer/Footer.js";
-import Button from "components/CustomButtons/Button.js";
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
 import Parallax from "components/Parallax/Parallax.js";
 import Navbar from "components/Navbar/Navbar";
 
-import profile from "assets/img/faces/christian.jpg";
 import styles from "assets/jss/material-kit-react/views/profilePage.js";
-
 import userService from "services/user.service";
 
 const useStyles = makeStyles(styles);
 
-export default function ProfilePage(props) {
+export default function ProfilePage() {
     const { username } = useParams();
 
     const [user, setUser] = useState({})
     const [emailHash, setEmailHash] = useState("")
 
     const classes = useStyles();
-    const { ...rest } = props;
 
     const imageClasses = classNames(
         classes.imgRaised,
         classes.imgRoundedCircle,
         classes.imgFluid
     );
-
-    const navImageClasses = classNames(classes.imgRounded, classes.imgGallery);
 
     const fetchUser = async() => {
         try {

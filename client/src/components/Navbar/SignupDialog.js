@@ -149,10 +149,10 @@ export default function SignupDialog(props) {
             <TextField
                 style={{marginTop: "3px", padding: "2px"}}
                 fullWidth
-                id="email"
+                id="signup-email"
                 name="email"
                 label="Email"
-                type="em"
+                type="email"
                 value={formik.values.email}
                 onChange={formik.handleChange}
                 error={formik.touched.email && Boolean(formik.errors.email)}
@@ -161,7 +161,7 @@ export default function SignupDialog(props) {
                 <TextField
                 style={{marginTop: "3px", padding: "2px"}}
                 fullWidth
-                id="username"
+                id="signup-username"
                 name="username"
                 label="Username"
                 value={formik.values.username}
@@ -172,7 +172,7 @@ export default function SignupDialog(props) {
                 <TextField
                 style={{marginTop: "3px", padding: "2px"}}
                 fullWidth
-                id="password"
+                id="signup-password"
                 name="password"
                 label="Password"
                 type="password"
@@ -184,7 +184,7 @@ export default function SignupDialog(props) {
                 <TextField
                 style={{marginTop: "3px", padding: "2px"}}
                 fullWidth
-                id="confirmPassword"
+                id="signup-confirmPassword"
                 name="confirmPassword"
                 label="Confirm password"
                 type="password"
@@ -193,7 +193,6 @@ export default function SignupDialog(props) {
                 error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
                 helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
                 />
-
                 <Button style={{ width: "100%", marginTop: "30px" }} 
                         color="rose" round type="submit" 
                         onSubmit={formik.onSubmit}>

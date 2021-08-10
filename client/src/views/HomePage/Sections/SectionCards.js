@@ -16,7 +16,7 @@ export default function SectionCards() {
       <h2 style={{textAlign: "center", fontWeight: "bold"}}>Ce este Phoenix?</h2>
       <div className={classes.container}>
         <div className={classes.title}>
-          <GridContainer justify="center" >
+          <GridContainer justifyContent="center" >
             <GridItem lg={4} md={6} sm={12}>
               <Card>
                 <img style={{ height: "250px" }} className={classes.imgCardTop} src={require("../../../assets/img/graphs.gif").default} alt="Card-img-cap" />

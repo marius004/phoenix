@@ -2,7 +2,9 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/marius004/phoenix/models"
 	"github.com/marius004/phoenix/util"
@@ -14,8 +16,21 @@ import (
 // params available: userId(int), problemId(int), score(int),
 // lang(string), status(string), compileError(boolean)
 func (s *API) GetSubmissions(w http.ResponseWriter, r *http.Request) {
-	filter := models.ParseSubmissionFilter(r)
+	filter := s.parseSubmissionFilter(r)
 	submissions, err := s.submissionService.GetByFilter(r.Context(), filter)
+
+	// I know it is not a good practice to do something like this
+	// but I hope I will restructure this in the future
+	for _, submission := range submissions {
+		if problem, err := s.problemService.GetById(r.Context(), submission.ProblemId); err == nil {
+			submission.ProblemName = problem.Name
+		}
+
+		if user, err := s.userService.GetById(r.Context(), submission.UserId); err == nil {
+			submission.EmailHash = s.calculateEmailHash(user.Email)
+			submission.Username = user.Username
+		}
+	}
 
 	if err != nil {
 		s.logger.Println(err)
@@ -57,4 +72,73 @@ func (s *API) CreateSubmission(w http.ResponseWriter, r *http.Request) {
 	}
 
 	util.DataResponse(w, http.StatusCreated, submission, s.logger)
+}
+
+func (s *API) parseSubmissionFilter(r *http.Request) *models.SubmissionFilter {
+	ret := models.SubmissionFilter{}
+
+	if v, ok := r.URL.Query()["username"]; ok {
+		last := len(v) - 1
+		username := v[last]
+
+		user, err := s.userService.GetByUsername(r.Context(), username)
+		if user != nil && err == nil {
+			ret.UserId = int(user.Id)
+		} else {
+			ret.UserId = -1
+		}
+	}
+
+	if v, ok := r.URL.Query()["lang"]; ok {
+		ret.Langs = convertUrlValuesToLangArr(v)
+	}
+
+	if v, ok := r.URL.Query()["problem"]; ok {
+		last := len(v) - 1
+		problemName := v[last]
+
+		problem, err := s.problemService.GetByName(r.Context(), problemName)
+		if problem != nil && err == nil {
+			ret.ProblemId = int(problem.Id)
+		} else {
+			ret.ProblemId = -1
+		}
+	}
+
+	if v, ok := r.URL.Query()["score"]; ok {
+		last := len(v) - 1
+		fmt.Println(v[last])
+		if val, err := strconv.Atoi(v[last]); err == nil {
+			ret.Score = val
+		}
+	} else {
+		ret.Score = -1
+	}
+
+	if v, ok := r.URL.Query()["status"]; ok {
+		ret.Statuses = convertUrlValuesToStatusArr(v)
+	}
+
+	if v, ok := r.URL.Query()["compileError"]; ok {
+		last := len(v) - 1
+		if val, err := strconv.ParseBool(v[last]); err == nil {
+			ret.CompileError = &val
+		}
+	}
+
+	if v, ok := r.URL.Query()["limit"]; ok {
+		last := len(v) - 1
+		if val, err := strconv.Atoi(v[last]); err == nil {
+			ret.Limit = val
+		}
+	}
+
+	if v, ok := r.URL.Query()["offset"]; ok {
+		last := len(v) - 1
+		if val, err := strconv.Atoi(v[last]); err == nil {
+			ret.Offset = val
+		}
+	}
+
+	return &ret
 }
