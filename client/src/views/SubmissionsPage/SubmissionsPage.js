@@ -31,6 +31,16 @@ export default function SubmissionsPage() {
     const [score, setScore] = useState("-1");
     const [page, setPage] = useState("0");
 
+    const isScoreFormattedOk = (score) => {
+       const nr = parseInt(score);
+       return nr >= -1 && nr <= 100;
+    }
+
+    const isPageFormattedOk = (page) => {
+        const nr = parseInt(page);
+        return nr >= 0;
+    }
+
     useEffect(async() => {
         const usernameValue = query.get("username");
         const problemValue  = query.get("problem");
@@ -47,9 +57,9 @@ export default function SubmissionsPage() {
             setStatus(status);
         if (languageValue !== null && languageValue !== "")
             setLanguage(languageValue);
-        if (scoreValue !== null && scoreValue !== "")
+        if (scoreValue !== null && scoreValue !== "" && isScoreFormattedOk(scoreValue))
             setScore(scoreValue);
-        if (pageValue !== null && pageValue !== "") 
+        if (pageValue !== null && pageValue !== "" && isPageFormattedOk(pageValue)) 
             setPage(pageValue);
 
         const q = buildSubmissionQuery();

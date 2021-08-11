@@ -24,7 +24,7 @@ export default function SubmissionFilter(props) {
       const value = e.target.value;
 
       if (value == "")
-        props.setPage("0");
+        props.setPage("");
       else {
         const nr = parseInt(value);
 
