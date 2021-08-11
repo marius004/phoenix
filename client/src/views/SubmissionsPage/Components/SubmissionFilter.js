@@ -13,7 +13,6 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
   
-
 export default function SubmissionFilter(props) {
     const classes = useStyles();
 
@@ -21,16 +20,30 @@ export default function SubmissionFilter(props) {
       return {width: "100%", margin: "0 auto", marginBottom: "12px", textAlign: "left"}
     };
 
-    const handleScoreChange = (e) => {
-        const value = parseInt(e.target.value);
-        if (value >= -1 && value <= 100)
-            props.setScore(value);
+    const handlePageChange = (e) => {
+      const value = e.target.value;
+
+      if (value == "")
+        props.setPage("0");
+      else {
+        const nr = parseInt(value);
+
+        if(nr >= 0)
+          props.setPage(value);
+      }
     }
 
-    const handlePageChange = (e) => {
-      const value = parseInt(e.target.value);
-      if (value >= 0)
-        props.setPage(value);
+    const handleScoreChange = (e) => {
+      const value = e.target.value;
+
+      if (value === "")
+        props.setScore("");
+      else {
+        const nr = parseInt(value);
+
+        if(nr >= -1 && nr <= 100)
+          props.setScore(value);
+      }
     }
 
     return (
@@ -123,8 +136,8 @@ SubmissionFilter.propTypes = {
     problemName: PropTypes.string.isRequired,
     status: PropTypes.string.isRequired,
     language: PropTypes.string.isRequired,
-    score: PropTypes.number.isRequired,
-    page: PropTypes.number.isRequired,
+    score: PropTypes.string.isRequired,
+    page: PropTypes.string.isRequired,
 
     onSubmit: PropTypes.func.isRequired
 };

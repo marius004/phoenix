@@ -58,51 +58,51 @@ export default function SubmissionTable({ submissions }) {
       return `Evaluated: ${submission.score}`
     }
 
-    if (submissions.length === 0 ) {
+    if (submissions.length === 0) {
       return <h3 style={{textAlign: "center"}}>No submission</h3>
     }
 
    return (
     <div>
-    <p style={{fontSize: "28px"}}> {submissions.length} records </p>
-    <TableContainer component={Paper}>
-      <Table aria-label="customized table">
-        <TableHead>
-          <TableRow>
-            <StyledTableCell>ID</StyledTableCell>
-            <StyledTableCell>User</StyledTableCell>
-            <StyledTableCell>Date</StyledTableCell>
-            <StyledTableCell>Problem</StyledTableCell>
-            <StyledTableCell align="right">Status</StyledTableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {submissions.map((row) => (
-            <StyledTableRow key={row.id}>
-              {/* TODO add link to submission */}
-              <StyledTableCell component="th" scope="row">
-                {row.id}
-              </StyledTableCell>
-              <StyledTableCell>
-                  <img src={`https://www.gravatar.com/avatar/${row.emailHash}?s=25`} alt="user icon"/> {"   "}
-                  {row.username}
-              </StyledTableCell>
-              <StyledTableCell>
-                {submissionDate(row.createdAt)} 
-                {"    "}
-                {submissionTime(row.createdAt)}
-              </StyledTableCell>
-              <StyledTableCell>
-                <Link to={`/problems/${row.problemName}`} style={{color: "black", textDecoration: "underline"}}>
-                  {row.problemName}
-                </Link>
-              </StyledTableCell>
-              <StyledTableCell align="right">{submissionStatus(row)}</StyledTableCell>
-            </StyledTableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+      <p style={{fontSize: "28px"}}> {submissions.length} records </p>
+      <TableContainer component={Paper}>
+        <Table aria-label="customized table">
+          <TableHead>
+            <TableRow>
+              <StyledTableCell>ID</StyledTableCell>
+              <StyledTableCell>User</StyledTableCell>
+              <StyledTableCell>Date</StyledTableCell>
+              <StyledTableCell>Problem</StyledTableCell>
+              <StyledTableCell align="right">Status</StyledTableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {submissions.map((row) => (
+              <StyledTableRow key={row.id}>
+                {/* TODO add link to submission */}
+                <StyledTableCell component="th" scope="row">
+                  {row.id}
+                </StyledTableCell>
+                <StyledTableCell>
+                    <img src={`https://www.gravatar.com/avatar/${row.emailHash}?s=25`} alt="user icon"/> {"   "}
+                    {row.username}
+                </StyledTableCell>
+                <StyledTableCell>
+                  {submissionDate(row.createdAt)} 
+                  {"    "}
+                  {submissionTime(row.createdAt)}
+                </StyledTableCell>
+                <StyledTableCell>
+                  <Link to={`/problems/${row.problemName}`} style={{color: "black", textDecoration: "underline"}}>
+                    {row.problemName}
+                  </Link>
+                </StyledTableCell>
+                <StyledTableCell align="right">{submissionStatus(row)}</StyledTableCell>
+              </StyledTableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import Navbar from "components/Navbar/Navbar";
 import Grid from '@material-ui/core/Grid';
 
 import { makeStyles } from "@material-ui/core/styles";
+import Alert from '@material-ui/lab/Alert';
 import classNames from "classnames";
 import styles from "assets/jss/material-kit-react/views/components.js";
 import SubmissionFilter from "./Components/SubmissionFilter";
@@ -16,8 +17,9 @@ import useQuery from "hooks/query";
 const useStyles = makeStyles(styles);
 
 export default function SubmissionsPage() {
-    const query = useQuery();
     const classes = useStyles();
+  
+    const query = useQuery();
     const history = useHistory();
 
     const [submissions, setSubmissions] = useState([]);
@@ -26,10 +28,10 @@ export default function SubmissionsPage() {
     const [problemName, setProblemName] = useState("");
     const [status, setStatus] = useState("-");
     const [language, setLanguage] = useState("-");
-    const [score, setScore] = useState(-1);
-    const [page, setPage] = useState(0);
+    const [score, setScore] = useState("-1");
+    const [page, setPage] = useState("0");
 
-    useEffect(() => {
+    useEffect(async() => {
         const usernameValue = query.get("username");
         const problemValue  = query.get("problem");
         const statusValue   = query.get("status");
@@ -37,29 +39,25 @@ export default function SubmissionsPage() {
         const scoreValue    = query.get("score"); 
         const pageValue     = query.get("page");
 
-        if (usernameValue !== null)
+        if (usernameValue !== null && usernameValue !== "")
             setUsername(usernameValue);
-        if (problemValue !== null)
+        if (problemValue !== null && problemValue !== "")
             setProblemName(problemValue);
-        if (statusValue !== null)
+        if (statusValue !== null && statusValue !== "")
             setStatus(status);
-        if (languageValue !== null)
+        if (languageValue !== null && languageValue !== "")
             setLanguage(languageValue);
-        if (scoreValue !== null) {
-            const nr = parseInt(scoreValue);
-            console.log(nr, typeof nr);
-            setScore(nr);
-        }
-        if (pageValue !== null) {
-            const nr = parseInt(pageValue);
-            setPage(nr);
-        }
+        if (scoreValue !== null && scoreValue !== "")
+            setScore(scoreValue);
+        if (pageValue !== null && pageValue !== "") 
+            setPage(pageValue);
+
+        const q = buildSubmissionQuery();
+        await fetchSubmissions(q);
     }, []);
 
-    const fetchSubmissions = async() => {
+    const fetchSubmissions = async(query) => {
         try {
-            const query = buildSubmissionQuery();
-            console.log("QUERY + PAGE: ", query, page);
             const res = await submissionService.getSubmissions(query, page);
     
             if (res.data != null) {
@@ -80,7 +78,7 @@ export default function SubmissionsPage() {
         history.push(`/submissions?${query}`)
 
         try {
-            await fetchSubmissions();
+            await fetchSubmissions(query);
         } catch(err) {
             console.log(err);
         }
@@ -109,6 +107,9 @@ export default function SubmissionsPage() {
         <div>
             <Navbar color="white" fixed ={false}/> 
             <div style={{marginTop: "100px"}} className={classNames(classes.main, classes.mainRaised)}>
+                <div style={{padding: "12px"}}>
+                    <Alert severity="error">If your URL contains query search parameters, please click the search button to filter the submissions!! (bug fix coming soon)</Alert>
+                </div>
                 <Grid container spacing={3} style={{padding: "12px"}}>
                     <Grid item xl={4} md={3} xs={5}>
                        <SubmissionFilter

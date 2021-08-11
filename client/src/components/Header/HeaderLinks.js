@@ -40,29 +40,19 @@ export default function HeaderLinks(props) {
           buttonIcon={Apps}
           dropdownList={[
             <Link to="/problems" className={classes.dropdownLink}>
-              <a href="" className={classes.dropdownLink}>
                Toate 
-              </a>
             </Link>,
             <Link to="/" className={classes.dropdownLink}>
-              <a href="" className={classes.dropdownLink}>
                 Clasa a IX-a
-              </a>
             </Link>,
             <Link to="/" className={classes.dropdownLink}>
-              <a href="" className={classes.dropdownLink}>
                 Clasa a X-a
-              </a>
             </Link>,
             <Link to="/" className={classes.dropdownLink}>
-              <a href="" className={classes.dropdownLink}>
                 Clasa a XI-a
-              </a>
             </Link>,
              <Link to="/" className={classes.dropdownLink}>
-             <a href="" className={classes.dropdownLink}>
                Concursuri
-             </a>
             </Link>,
           ]}
         />
@@ -84,14 +74,10 @@ export default function HeaderLinks(props) {
           dropdownList={[
             // TODO
             <Link to="/" className={classes.dropdownLink}>
-              <a href="" className={classes.dropdownLink}>
                 Competitive Programming
-              </a>
             </Link>,
             <Link to="/" className={classes.dropdownLink}>
-              <a href="" className={classes.dropdownLink}>
                 Web Development
-              </a>
             </Link>,
           ]}
         />
@@ -99,15 +85,15 @@ export default function HeaderLinks(props) {
       {
         !authenticationService.isLoggedIn() &&
         <>
-          <ListItem className={classes.listItem}>
-            <Button style={{ paddingLeft: "8px", paddingRight: "8px"}} color="transparent" onClick={props.onSignup}>
-              <i style={{ fontSize: "18px", marginRight: "4px" }} className="fa fa-user" aria-hidden="true"></i>
+          <ListItem className={classes.dropdownLink}>
+            <Button color="transparent" onClick={props.onSignup}>
+              <i style={{ fontSize: "18px"}} className="fa fa-user" aria-hidden="true"/>
               Inregistrare
             </Button>
           </ListItem>
-          <ListItem className={classes.listItem}>
-            <Button style={{ paddingLeft: "8px", paddingRight: "8px" }} color="transparent" onClick={props.onLogin}>
-              <i style={{ fontSize: "18px", marginRight: "4px" }} className="fa fa-sign-in" aria-hidden="true"></i>
+          <ListItem className={classes.dropdownLink}>
+            <Button color="transparent" onClick={props.onLogin}>
+              <i style={{ fontSize: "18px" }} className="fa fa-sign-in" aria-hidden="true"/>
               Autentificare
             </Button>
           </ListItem>
@@ -127,24 +113,19 @@ export default function HeaderLinks(props) {
           buttonIcon={PermIdentity}
           dropdownList={[
             <Link to={getUserProfileLink()} className={classes.dropdownLink}>
-              <ListItem className={classes.listItem}>
-                <Button className={classes.dropdownLink} style={{ paddingLeft: "8px", paddingRight: "8px"}} color="transparent">
-                  <i style={{ fontSize: "18px", marginRight: "4px" }} className="fa fa-user" aria-hidden="true"></i>
-                  Profile
-                </Button>
-              </ListItem>
-            </Link>,
-            <ListItem className={classes.listItem}>
-              <Button className={classes.dropdownLink} style={{ paddingLeft: "8px", paddingRight: "8px"}} color="transparent" onClick={() => handleLogout()}>
-                <i style={{ fontSize: "18px", marginRight: "4px" }} className="fa fa-sign-out"></i>
-                Log out
+              <Button className={classes.dropdownLink} color="transparent">
+                <i style={{ fontSize: "18px"}} className="fa fa-user" aria-hidden="true"></i>
+                Profile
               </Button>
-            </ListItem>,
+            </Link>,
+            <Button className={classes.dropdownLink} color="transparent" onClick={() => handleLogout()}>
+              <i style={{ fontSize: "18px"}} className="fa fa-sign-out"></i>
+              Log out
+            </Button>
           ]}
         />
         </ListItem> 
       }
-     
     </List>
   );
 }
