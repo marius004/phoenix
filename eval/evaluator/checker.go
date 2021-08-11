@@ -3,7 +3,6 @@ package evaluator
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -72,11 +71,6 @@ func (c *CheckerHandler) parseString(str string) string {
 func (handler *CheckerHandler) Check(received, expected []byte) bool {
 	receivedStr := handler.parseString(string(received))
 	expectedStr := handler.parseString(string(expected))
-
-	fmt.Println("-------------------------------------------------")
-	fmt.Printf("-%s-\n", receivedStr)
-	fmt.Printf("-%s-\n", expectedStr)
-	fmt.Println("-------------------------------------------------")
 
 	return receivedStr == expectedStr
 }

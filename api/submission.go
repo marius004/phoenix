@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -44,6 +43,16 @@ func (s *API) GetSubmissions(w http.ResponseWriter, r *http.Request) {
 // GetSubmissions is the handler behind GET /api/submissions/{submissionId}
 func (s *API) GetSubmissionById(w http.ResponseWriter, r *http.Request) {
 	submission := util.SubmissionFromRequestContext(r)
+
+	if problem, err := s.problemService.GetById(r.Context(), submission.ProblemId); err == nil {
+		submission.ProblemName = problem.Name
+	}
+
+	if user, err := s.userService.GetById(r.Context(), submission.UserId); err == nil {
+		submission.EmailHash = s.calculateEmailHash(user.Email)
+		submission.Username = user.Username
+	}
+
 	util.DataResponse(w, http.StatusOK, submission, s.logger)
 }
 
@@ -107,7 +116,6 @@ func (s *API) parseSubmissionFilter(r *http.Request) *models.SubmissionFilter {
 
 	if v, ok := r.URL.Query()["score"]; ok {
 		last := len(v) - 1
-		fmt.Println(v[last])
 		if val, err := strconv.Atoi(v[last]); err == nil {
 			ret.Score = val
 		}

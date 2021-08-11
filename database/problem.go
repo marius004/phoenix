@@ -35,7 +35,6 @@ func (s *ProblemService) GetByFilter(ctx context.Context, filter *models.Problem
 		return problems, nil
 	}
 
-	fmt.Println(fmt.Sprintf("SELECT * FROM problems WHERE %s", strings.Join(queryList, " AND ")))
 	query := s.db.Rebind(fmt.Sprintf("SELECT * FROM problems WHERE %s", strings.Join(queryList, " AND ")))
 	if err := s.db.Select(&problems, query, args...); err != nil {
 		return nil, err
