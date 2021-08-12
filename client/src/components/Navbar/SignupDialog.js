@@ -12,7 +12,7 @@ import styles from "assets/jss/material-kit-react/views/componentsSections/javas
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import TextField from '@material-ui/core/TextField';
-import authenticationService from "../../services/authentication.service.js";
+import authenticationAPI from "api/authentication";
 import Alert from '@material-ui/lab/Alert';
 import CloseIcon from '@material-ui/icons/Close';
 
@@ -85,7 +85,7 @@ export default function SignupDialog(props) {
         validationSchema: validationSchema,
         onSubmit: async (values) => {
           try {
-            await authenticationService.signup(values.username, values.password,  values.email);
+            await authenticationAPI.signup(values.username, values.password,  values.email);
             window.location.reload()
           } catch(err) {
             let message = err.response.data.message;

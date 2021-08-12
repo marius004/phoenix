@@ -7,7 +7,7 @@ import Container from '@material-ui/core/Container';
 import MDEditor from '@uiw/react-md-editor';
 import NavPills from "components/NavPills/NavPills.js";
 
-import problemService from "services/problem.service";
+import problemAPI from "api/problem";
 import ProblemTable from "./Components/ProblemTable";
 import ProblemSubmissions from "./Components/ProblemSubmission";
 
@@ -17,9 +17,21 @@ import Button from "components/CustomButtons/Button.js";
 import Footer from "components/Footer/Footer";
 import { ToastContainer, toast } from 'react-toastify';
 
-import evaluatorService from "services/evaluator.service";
-import authenticationService from "services/authentication.service";
+import submissionAPI from "api/submission";
+import authenticationUtil from "util/authentication";
+
 import Loading from "views/Components/Loading";
+
+const toastConfig = {
+    fontSize: 30,
+    position: "bottom-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: false,
+    draggable: false,
+    progress: undefined,
+}
 
 const ProblemPage = () => {
     
@@ -44,8 +56,8 @@ const ProblemPage = () => {
 
     const fetchProblem = async() => {
         try {
-            const res = await problemService.getByName(problemName);
-            setProblem(res.data);
+            const res = await problemAPI.getByName(problemName);
+            setProblem(res);
         } catch (err) {
           console.error(err);
         } finally {
@@ -59,28 +71,20 @@ const ProblemPage = () => {
 
         const timer = setInterval(async() => {
             console.log("iterating...")
+            
             if (submissionId < 0)
                 return;
 
-            const res = await evaluatorService.getSubmission(submissionId);
+            const submission = await submissionAPI.getById(submissionId);
 
-            if (res.data.status === "finished") {
-                const config = {
-                    fontSize: 30,
-                    position: "bottom-right",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: false,
-                    draggable: false,
-                    progress: undefined,
-                }
-                if (res.data.score === 100) {
-                    toast.success(<p>Submission #{submissionId} evaluated <br/> Score: {res.data.score}</p>, config);
-                } else if(res.data.score >= 50) {
-                    toast.warning(<p>Submission #{submissionId} evaluated <br/> Score: {res.data.score}</p>, config);
+            if (submission.status === "finished") {
+
+                if (submission.score === 100) {
+                    toast.success(<p>Submission #{submissionId} evaluated <br/> Score: {submission.score}</p>, toastConfig);
+                } else if(submission.score >= 50) {
+                    toast.warning(<p>Submission #{submissionId} evaluated <br/> Score: {submission.score}</p>, toastConfig);
                 } else {
-                    toast.error(<p>Submission #{submissionId} evaluated <br/> Score: {res.data.score}</p>, config);
+                    toast.error(<p>Submission #{submissionId} evaluated <br/> Score: {submission.score}</p>, toastConfig);
                 }
 
                 clearInterval(timer);
@@ -96,8 +100,8 @@ const ProblemPage = () => {
        
     const handleCodeSubmission = async() => {
         try {
-            const res = await evaluatorService.createSubmission(code, lang, problem.id);
-            setSubmissionId(res.data.id);
+            const res = await submissionAPI.create(code, lang, problem.id);
+            setSubmissionId(res.id);
             
             toast.info("Submission Sent", {
                 fontSize: 30,
@@ -153,7 +157,7 @@ const ProblemPage = () => {
                         },
                         ]}
                     />
-                {authenticationService.isLoggedIn() &&
+                {authenticationUtil.isUserLoggedIn() &&
                 <div style={{border: "1px solid #bdbdbd", padding: "20px", margin: "20px 0 0px 0"}}>
                     <EditorSettings 
                         setFontSize={setFontSize} 

@@ -1,8 +1,5 @@
 import React, {useState, useEffect} from "react";
 import PropTypes from "prop-types";
-import authenticationService from "services/authentication.service";
-import evaluatorService from "services/evaluator.service";
-import userService from "services/user.service";
 
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -12,6 +9,12 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+
+import authenticationAPI from "api/authentication";
+import userAPI from "api/user";
+import authenticationUtil from "util/authentication";
+import userUtil from "util/user";
+import submissionAPI from "api/submission";
 
 const useStyles = makeStyles({
     table: {
@@ -28,27 +31,22 @@ const useStyles = makeStyles({
 const ProblemSubmissions = ({ problem }) => {
     
     const [submissions, setSubmissions] = useState([])
-    const isLoggedIn = authenticationService.isLoggedIn();
     const classes = useStyles();
 
     const fetchSubmissions = async() => {
-        if (!isLoggedIn) return;
+        if (!authenticationUtil.isUserLoggedIn()) return;
 
-        const userId = userService.getUserId();
+        const userId = userUtil.getUserId();
 
         try {
-            const res = await evaluatorService.getSubmissions(userId, problem.id);
-            let submissions = res.data;
-            
-            submissions.sort((a, b) => b.id - a.id);
-
+            const submissions = await submissionAPI.getByUserAndProblem(userId, problem.id);  
             setSubmissions(submissions);
         } catch(err) {
             console.error(err);
         }
     }
 
-    if (!isLoggedIn) {
+    if (!authenticationUtil.isUserLoggedIn()) {
         return (
             <div className={classes.container}>
                 <h1 style={{textAlign: "center"}}>You must be logged in to see your submissions!</h1>

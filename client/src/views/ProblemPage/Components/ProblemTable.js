@@ -8,8 +8,9 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import PropTypes from "prop-types";
-import userService from 'services/user.service';
 import { Link } from 'react-router-dom';
+
+import userAPI from 'api/user';
 
 const useStyles = makeStyles({
   gravatar: {
@@ -23,8 +24,8 @@ export default function ProblemTable({ data }) {
 
   const fetchGravatarData = async() => {
     try {
-      const res = await userService.getGravatarEmailHash(data.authorId);
-      setGravatarData(res.data);
+      const gravatar = await userAPI.getGravatar(data.authorId);
+      setGravatarData(gravatar);
     } catch(err) {
       console.error(err);
     }

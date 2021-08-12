@@ -10,7 +10,9 @@ import Parallax from "components/Parallax/Parallax.js";
 import Navbar from "components/Navbar/Navbar";
 
 import styles from "assets/jss/material-kit-react/views/profilePage.js";
-import userService from "services/user.service";
+import userAPI from "api/user";
+import { unary } from "lodash";
+import userUtil from "util/user";
 
 const useStyles = makeStyles(styles);
 
@@ -30,10 +32,10 @@ export default function ProfilePage() {
 
     const fetchUser = async() => {
         try {
-            const res = await userService.getByUserName(username);
-            setUser(res.data);
+            const user = await userAPI.getByUsername(username);
+            setUser(user);
 
-            const emailHash = userService.calculateEmailHash(res.data.email)
+            const emailHash = userUtil.calculateEmailHash(user.email)
             setEmailHash(emailHash);
         } catch(err) {
             console.error(err);
@@ -57,7 +59,7 @@ export default function ProfilePage() {
         <div className={classNames(classes.main, classes.mainRaised)}>
             <div>
             <div className={classes.container}>
-                <GridContainer justify="center">
+                <GridContainer justifyContent="center">
                 <GridItem xs={12} sm={12} md={6}>
                     <div className={classes.profile}>
                     <div>

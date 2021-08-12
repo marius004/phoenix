@@ -51,7 +51,7 @@ const Problem = ({problem}) => {
     );
 }
 
-Problem.PropTypes = {
+Problem.propTypes = {
     problem: PropTypes.object.isRequired
 };
 

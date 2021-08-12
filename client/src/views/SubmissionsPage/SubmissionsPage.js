@@ -8,11 +8,12 @@ import Alert from '@material-ui/lab/Alert';
 import classNames from "classnames";
 import styles from "assets/jss/material-kit-react/views/components.js";
 import SubmissionFilter from "./Components/SubmissionFilter";
-import submissionService from "services/submission.service";
 import { useHistory } from "react-router-dom";
 import SubmissionTable from "./Components/SubmissionTable";
 import Footer from "components/Footer/Footer";
 import useQuery from "hooks/query";
+
+import submissionAPI from "api/submission";
 
 const useStyles = makeStyles(styles);
 
@@ -68,10 +69,10 @@ export default function SubmissionsPage() {
 
     const fetchSubmissions = async(query) => {
         try {
-            const res = await submissionService.getSubmissions(query, page);
+            const submissions = await submissionAPI.getByQuery(query, page);
     
-            if (res.data != null) {
-                setSubmissions(res.data);
+            if (submissions !== null) {
+                setSubmissions(submissions);
             } else {
                 setSubmissions([]);
             }

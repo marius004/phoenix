@@ -1,17 +1,18 @@
 import Navbar from "components/Navbar/Navbar";
 import React, { useEffect, useState } from "react";
-import classNames from "classnames";
-import useQuery from "hooks/query";
 import { makeStyles } from "@material-ui/core/styles";
 import styles from "assets/jss/material-kit-react/views/components.js";
-import problemService from "services/problem.service";
+import classNames from "classnames";
+import useQuery from "hooks/query";
 import Problems from "views/Components/Problems";
 import Footer from "components/Footer/Footer";
 import Loading from "views/Components/Loading";
 
+import problemAPI from "api/problem";
+
 const useStyles = makeStyles(styles);
 
-const ProblemSetPage = () => {
+const ProblemsPage = () => {
 
     const [loading, setLoading] = useState(true);
     const [fetchingStatus, setFetchingStatus] = useState(200);
@@ -21,13 +22,13 @@ const ProblemSetPage = () => {
     const query = useQuery();
 
     useEffect(() => {
-        console.log(query.get("grade"))
+        //console.log(query.get("grade"))
     }, []);
 
     const fetchProblems = async () => {
         try {
-            const res = await problemService.getAll();
-            setProblems(res.data);
+            const problems = await problemAPI.getAll();
+            setProblems(problems);
         }catch(err) {
             if (err.message == "Network Error") {
                 setFetchingStatus(500);
@@ -63,4 +64,4 @@ const ProblemSetPage = () => {
     </>);
 }
 
-export default ProblemSetPage;
+export default ProblemsPage;
