@@ -40,6 +40,18 @@ func (s *SubmissionTestService) GetById(ctx context.Context, id uint64) (*models
 	return &submissionTest, err
 }
 
+func (s *SubmissionTestService) GetBySubmissionAndTestId(ctx context.Context, submissionId, testId uint64) (*models.SubmissionTest, error) {
+	var submissionTest models.SubmissionTest
+	err := s.db.GetContext(ctx, &submissionTest, s.db.Rebind("SELECT * FROM submission_tests WHERE submission_id = ? AND test_id = ? LIMIT 1"), submissionId, testId)
+
+	if err != nil {
+		s.logger.Println(err)
+		return nil, err
+	}
+
+	return &submissionTest, err
+}
+
 func (s *SubmissionTestService) Create(ctx context.Context, tst *models.SubmissionTest) error {
 	var id uint64
 

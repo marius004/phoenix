@@ -57,7 +57,9 @@ func (handler *CompileHandler) Handle(next chan *models.Submission) {
 			if err := handler.sandboxManager.RunTask(context.Background(), compile); err != nil {
 				handler.logger.Println(err)
 
-				updateSubmission := models.NewUpdateSubmissionRequest(0, models.Finished, "evaluator error: "+err.Error(), &noError)
+				updateSubmission := &models.UpdateSubmissionRequest{
+					Message: submission.Message,
+				}
 				if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), updateSubmission); err != nil {
 					handler.logger.Println(err)
 					return
@@ -70,8 +72,14 @@ func (handler *CompileHandler) Handle(next chan *models.Submission) {
 				if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), updateSubmission); err != nil {
 					handler.logger.Println(err)
 				}
-
 				return
+			}
+
+			if compile.Response.Message != "" {
+				update := &models.UpdateSubmissionRequest{Message: compile.Response.Message}
+				if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), update); err != nil {
+					handler.logger.Println(err)
+				}
 			}
 
 			// succesful compilation

@@ -17,6 +17,7 @@ type Sandbox interface {
 	CreateDirectory(path string, perm fs.FileMode) error
 	DeleteDirectory(path string) error
 
+	FileExists(path string) bool
 	CreateFile(path string, perm fs.FileMode) error
 	WriteToFile(path string, data []byte, perm fs.FileMode) error
 	ReadFile(path string) ([]byte, error)

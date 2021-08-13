@@ -88,6 +88,59 @@ func (handler *CheckerHandler) Handle(next chan *models.Submission) {
 		}
 
 		for _, test := range data.tests {
+			submissionTest, err := handler.services.SubmissionTestService.GetBySubmissionAndTestId(context.Background(), submission.Id, test.Id)
+
+			if err != nil {
+				update := &models.UpdateSubmissionTestRequest{
+					Score:  0,
+					Time:   -1, // -1 == skip
+					Memory: -1,
+
+					Message:  "evaluator internal error: could not get submission test",
+					ExitCode: -1,
+				}
+
+				if err := handler.services.SubmissionTestService.Update(context.Background(), submission.Id, test.Id, update); err != nil {
+					handler.logger.Println(err)
+				}
+
+				continue
+			}
+
+			if submissionTest.Time > data.problem.TimeLimit {
+				update := &models.UpdateSubmissionTestRequest{
+					Score:  0,
+					Time:   -1, // -1 == skip
+					Memory: -1,
+
+					Message:  "time limit exceeded",
+					ExitCode: -1,
+				}
+
+				if err := handler.services.SubmissionTestService.Update(context.Background(), submission.Id, test.Id, update); err != nil {
+					handler.logger.Println(err)
+				}
+
+				continue
+			}
+
+			if submissionTest.Memory > data.problem.MemoryLimit {
+				update := &models.UpdateSubmissionTestRequest{
+					Score:  0,
+					Time:   -1, // -1 == skip
+					Memory: -1,
+
+					Message:  "memory limit exceeded",
+					ExitCode: -1,
+				}
+
+				if err := handler.services.SubmissionTestService.Update(context.Background(), submission.Id, test.Id, update); err != nil {
+					handler.logger.Println(err)
+				}
+
+				continue
+			}
+
 			output, err := handler.services.TestManager.GetOutputTest(uint(test.Id), data.problem.Name)
 
 			if err != nil {

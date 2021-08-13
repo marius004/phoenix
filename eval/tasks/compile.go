@@ -42,7 +42,9 @@ func (task *CompileTask) Run(ctx context.Context, sandbox eval.Sandbox) error {
 			task.Response.Message = err.Error()
 			task.Logger.Printf("Could not compile %s\n", err.Error())
 			return err
-		} else if task.Response.Message != "" {
+		}
+
+		if !eval.CompiledSourceCode(sandbox, lang.Executable) {
 			task.Response.Success = false
 			return nil
 		}

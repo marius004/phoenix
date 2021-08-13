@@ -61,6 +61,16 @@ func (c *Container) WriteToFile(path string, data []byte, perm fs.FileMode) erro
 	return err
 }
 
+func (c *Container) FileExists(path string) bool {
+	fullPath := c.GetPath(path)
+
+	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
+		return false
+	}
+
+	return true
+}
+
 func (c *Container) CreateFile(path string, perm fs.FileMode) error {
 	fullPath := c.GetPath(path)
 	file, err := os.OpenFile(fullPath, os.O_CREATE|os.O_RDONLY|os.O_TRUNC, perm)

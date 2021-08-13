@@ -86,3 +86,7 @@ func GetBinaryName(config *models.Config, submissionId int) string {
 func GetOutputFileName(config *models.Config, submission *models.Submission, test *models.Test) string {
 	return config.OutputPath + "/s" + strconv.Itoa(int(submission.Id)) + "t" + strconv.Itoa(int(test.Id)) + ".out"
 }
+
+func CompiledSourceCode(sandbox Sandbox, fileName string) bool {
+	return sandbox.FileExists(fileName)
+}
