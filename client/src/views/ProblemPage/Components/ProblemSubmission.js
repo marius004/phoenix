@@ -10,8 +10,6 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
-import authenticationAPI from "api/authentication";
-import userAPI from "api/user";
 import authenticationUtil from "util/authentication";
 import userUtil from "util/user";
 import submissionAPI from "api/submission";

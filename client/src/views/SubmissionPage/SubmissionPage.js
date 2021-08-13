@@ -9,8 +9,11 @@ import styles from "assets/jss/material-kit-react/views/components.js";
 import classNames from "classnames";
 
 import submissionAPI from "api/submission";
-import submissionTestAPI from "api/submissionTest";
+import submissionTestAPI from "api/submission-test";
 import problemAPI from "api/problem";
+import ProblemCard from "./Components/ProblemCard";
+import SubmissionSourceCode from "./Components/SubmissionSourceCode";
+import SubmissionStatus from "./Components/SubmissionStatus";
 
 const useStyles = makeStyles(styles);
 
@@ -21,56 +24,53 @@ export default function SubmissionPage(props) {
     const [submissionTests, setSubmissionTests] = useState([]);
 
     const classes = useStyles();
-    const { submissionId } = useParams();
-
-    const fetchProblem = async (problemName) => {
-        try {
-            const problem = await problemAPI.getByName(problemName);
-            setProblem(problem);
-        } catch (err) {
-          console.error(err);
-        }
-    }
-
-    const fetchSubmission = async (submissionId) => {
-        try {
-           const submission = await submissionAPI.getById(submissionId);
-           setSubmission(submission);
-        } catch(err) {
-            console.error(err);
-        }
-    }
-
-    const fetchSubmissionTests = async (submissionId) => {
-        try {
-            const tests = await submissionTestAPI.getBySubmissionId(submissionId);
-            setSubmissionTests(tests);
-        } catch(err) {
-            console.error(err);
-        }
-    }
+    const { submissionId } = useParams();  
 
     useEffect(async() => {
 
-        await fetchSubmission(submissionId);
-        await fetchSubmissionTests(submissionId);
-        await fetchProblem(submission.problemName);
+        const submission = await submissionAPI.getById(submissionId);
+        const submissionTests = await submissionTestAPI.getBySubmissionId(submissionId);
+        const problem = await problemAPI.getByName(submission.problemName);
+
+        setProblem(problem);
+        setSubmissionTests(submissionTests);
+        setSubmission(submission);
 
         console.log(problem, submission, submissionTests)
     }, []);
 
+    const authorProfile = (username) => {
+        return `/profile/${username}`
+    }
+
     return (
-        <div>
+        <div style={{marginBottom: "40px"}}>
             <Navbar color="white" fixed ={false}/> 
             <div style={{marginTop: "100px"}} className={classNames(classes.main, classes.mainRaised)}>
-                <Grid container spacing={3} style={{padding: "12px"}}>
-                    <Grid item xl={4} md={3} xs={5}>
-                        <h3>Submission {submissionId}</h3>
+                <Grid container spacing={1} style={{padding: "12px"}}>
+                    <Grid item xl={2} md={3} xs={12} style={{textAlign: "center"}}>
+                        <h3>Submission #{submission.id}</h3>
+                        <h3>Author: {"  "}
+                            <a style={{color: "inherit", textDecoration: "underline"}} href={authorProfile(submission.username)}>
+                                {submission.username}
+                            </a>    
+                        </h3>
+                        <h3>Score: {submission.score}</h3>
                     </Grid>
-                    <Grid item xl={8} md={9} xs={7}>
-                        <h3>Submission {submissionId}</h3>
+                    <Grid item xl={10} md={9} xs={12}>
+                        <ProblemCard 
+                            problem={problem} 
+                            submission={submission}
+                        />
+                        <SubmissionStatus
+                            submission={submission}
+                            submissionTests={submissionTests}
+                        />
+                        <SubmissionSourceCode 
+                            problem={problem} 
+                            submission={submission}
+                        />
                     </Grid>
-                    
                 </Grid>
             </div>
         </div>

@@ -6,7 +6,7 @@ const submissionTestAPI = {
 };
 
 function getBySubmissionId(submissionId) {
-    return axios.get(`${config.apiUrl}/submission-tests/${submissionId}`, config.cors)
+    return axios.get(`${config.apiUrl}/submissions/${submissionId}/tests`, config.cors)
         .then(res => res.data);
 }
 
