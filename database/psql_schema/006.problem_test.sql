@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS tests (
+CREATE TABLE IF NOT EXISTS problem_tests (
     id bigserial PRIMARY KEY,
     created_at timestamp NOT NULL DEFAULT NOW(),
 

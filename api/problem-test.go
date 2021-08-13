@@ -10,7 +10,7 @@ import (
 
 // CreateTest is the handler behind POST /api/tests/
 func (s *API) CreateTest(w http.ResponseWriter, r *http.Request) {
-
+	problem := util.ProblemFromRequestContext(r)
 	var data models.CreateTestRequest
 
 	jsonDecoder := json.NewDecoder(r.Body)
@@ -18,12 +18,6 @@ func (s *API) CreateTest(w http.ResponseWriter, r *http.Request) {
 
 	if err := jsonDecoder.Decode(&data); err != nil {
 		util.ErrorResponse(w, http.StatusBadRequest, err.Error(), s.logger)
-		return
-	}
-
-	problem, err := s.problemService.GetById(r.Context(), data.ProblemId)
-	if problem == nil || err != nil {
-		util.ErrorResponse(w, http.StatusBadRequest, "Problem with the specified id does not exist", s.logger)
 		return
 	}
 
@@ -37,7 +31,7 @@ func (s *API) CreateTest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	test := models.NewTest(data)
+	test := models.NewTest(data, int(problem.Id))
 	if err := s.testService.Create(r.Context(), test); err != nil {
 		s.logger.Println(err)
 		util.ErrorResponse(w, http.StatusInternalServerError, "Could not create test", s.logger)
@@ -59,7 +53,9 @@ func (s *API) CreateTest(w http.ResponseWriter, r *http.Request) {
 
 // UpdateTestById is the handler behind PUT /api/tests/
 func (s *API) UpdateTestById(w http.ResponseWriter, r *http.Request) {
+	problem := util.ProblemFromRequestContext(r)
 	test := util.TestFromRequestContext(r)
+
 	var data models.UpdateTestRequest
 
 	jsonDecoder := json.NewDecoder(r.Body)
@@ -67,12 +63,6 @@ func (s *API) UpdateTestById(w http.ResponseWriter, r *http.Request) {
 
 	if err := jsonDecoder.Decode(&data); err != nil {
 		util.ErrorResponse(w, http.StatusBadRequest, err.Error(), s.logger)
-		return
-	}
-
-	problem, err := s.problemService.GetById(r.Context(), test.ProblemId)
-	if problem == nil || err != nil {
-		util.ErrorResponse(w, http.StatusBadRequest, "Problem with the specified id does not exist", s.logger)
 		return
 	}
 
@@ -142,27 +132,10 @@ func (s *API) GetTestById(w http.ResponseWriter, r *http.Request) {
 	util.DataResponse(w, http.StatusOK, fullTest, s.logger)
 }
 
-// CreateTest is the handler behind GET /api/tests/
-func (s *API) GetAllTests(w http.ResponseWriter, r *http.Request) {
-	tests, err := s.testService.GetAllTests(r.Context())
-
-	if err != nil {
-		util.ErrorResponse(w, http.StatusInternalServerError, "Could not retrive the tests", s.logger)
-		return
-	}
-
-	util.DataResponse(w, http.StatusOK, tests, s.logger)
-}
-
 // DeleteTestById is the handler behind DELETE /api/tests/{testId}
 func (s *API) DeleteTestById(w http.ResponseWriter, r *http.Request) {
+	problem := util.ProblemFromRequestContext(r)
 	test := util.TestFromRequestContext(r)
-
-	problem, err := s.problemService.GetById(r.Context(), test.ProblemId)
-	if err != nil || problem == nil {
-		util.ErrorResponse(w, http.StatusBadRequest, "Problem does not exist", s.logger)
-		return
-	}
 
 	if !s.canManageProblemResources(r, problem) {
 		util.ErrorResponse(w, http.StatusUnauthorized, "You cannot delete this test!", s.logger)
@@ -194,7 +167,6 @@ func (s *API) DeleteTestById(w http.ResponseWriter, r *http.Request) {
 // Returns all the tests for the specified problem
 func (s *API) GetProblemTests(w http.ResponseWriter, r *http.Request) {
 	problem := util.ProblemFromRequestContext(r)
-
 	tests, err := s.testService.GetAllProblemTests(r.Context(), int(problem.Id))
 
 	if err != nil {

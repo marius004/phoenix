@@ -7,10 +7,9 @@ import (
 )
 
 var (
-	testScoreValidation     = []validation.Rule{validation.Required, validation.Max(100)}
-	testProblemIdValidation = []validation.Rule{validation.Required, validation.Min(1)}
-	testInputValidation     = []validation.Rule{validation.Required}
-	testOutputValidation    = []validation.Rule{validation.Required}
+	testScoreValidation  = []validation.Rule{validation.Required, validation.Max(100)}
+	testInputValidation  = []validation.Rule{validation.Required}
+	testOutputValidation = []validation.Rule{validation.Required}
 )
 
 type Test struct {
@@ -22,31 +21,29 @@ type Test struct {
 }
 
 type CreateTestRequest struct {
-	ProblemId int    `json:"problemId"`
-	Score     int    `json:"score"`
-	Input     []byte `json:"input"`
-	Output    []byte `json:"output"`
+	Score  int    `json:"score"`
+	Input  []byte `json:"input"`
+	Output []byte `json:"output"`
 }
 
 func (data CreateTestRequest) Validate() error {
 	return validation.ValidateStruct(&data,
 		validation.Field(&data.Score, testScoreValidation...),
-		validation.Field(&data.ProblemId, testProblemIdValidation...),
 		validation.Field(&data.Input, testInputValidation...),
 		validation.Field(&data.Output, testOutputValidation...),
 	)
 }
 
-func NewTest(request CreateTestRequest) *Test {
+func NewTest(request CreateTestRequest, problemId int) *Test {
 	return &Test{
 		Score:     request.Score,
-		ProblemId: request.ProblemId,
+		ProblemId: problemId,
 	}
 }
 
-// FullTest is an extended Test that has input and output fields.
+// FullTest is an extended Test that additionally has input and output fields.
 type FullTest struct {
-	Test  		  `json:"test"`
+	Test   `json:"test"`
 	Input  string `json:"input"`
 	Output string `json:"output"`
 }
@@ -57,6 +54,11 @@ func NewFullTest(test Test, inputUri, outputUri string) *FullTest {
 		inputUri,
 		outputUri,
 	}
+}
+
+type TestFilter struct {
+	ProblemId int
+	Score     int
 }
 
 // TODO add input and output validation

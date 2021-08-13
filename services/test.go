@@ -20,9 +20,6 @@ type TestService interface {
 	// GetAllProblemTests retrieves all the tests for the specified problem
 	GetAllProblemTests(ctx context.Context, problemId int) ([]*models.Test, error)
 
-	// GetAllTests retrieves all the tests from the datasource
-	GetAllTests(ctx context.Context) ([]*models.Test, error)
-
 	// Update updates the test for a given problem
 	Update(ctx context.Context, testId, problemId int, test *models.Test) error
 

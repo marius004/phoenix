@@ -86,38 +86,37 @@ func (s *API) Routes() http.Handler {
 		r.Get("/", s.GetProblems)
 		r.With(s.MustBeProposer).Post("/", s.CreateProblem)
 
-		r.Route("/{problemName}", func(r chi.Router) {
-			r.Use(s.ProblemCtx)
+		r.With(s.ProblemCtx).Route("/{problemName}", func(r chi.Router) {
 			r.Get("/", s.GetProblemByName)
+
 			r.With(s.MustBeProposer).Put("/", s.UpdateProblemByName)
 			r.With(s.MustBeProposer).Delete("/", s.DeleteByName)
+
+			r.Route("/tests", func(r chi.Router) {
+
+				r.With(s.MustBeProposer).Get("/", s.GetProblemTests)
+				r.With(s.MustBeProposer).Post("/", s.CreateTest)
+
+				r.With(s.TestCtx).Route("/{testId}", func(r chi.Router) {
+					r.With(s.MustBeProposer).Get("/", s.GetTestById)
+					r.With(s.MustBeProposer).Put("/", s.UpdateTestById)
+					r.With(s.MustBeProposer).Delete("/", s.DeleteTestById)
+				})
+
+			})
 		})
-	})
-
-	r.Route("/tests", func(r chi.Router) {
-		r.With(s.MustBeAdmin).Get("/", s.GetAllTests)
-		r.With(s.MustBeProposer).Post("/", s.CreateTest)
-
-		r.Route("/{testId}", func(r chi.Router) {
-			r.Use(s.TestCtx)
-			r.With(s.MustBeProposer).Get("/", s.GetTestById)
-			r.With(s.MustBeProposer).Put("/", s.UpdateTestById)
-			r.With(s.MustBeProposer).Delete("/", s.DeleteTestById)
-		})
-
-		r.With(s.ProblemCtx, s.MustBeProposer).Get("/{problemName}", s.GetProblemTests)
 	})
 
 	go s.evaluator.Serve()
 
 	r.Route("/submissions", func(r chi.Router) {
 		r.Get("/", s.GetSubmissions)
-		r.With(s.SubmissionCtx).Get("/{submissionId}", s.GetSubmissionById)
 		r.With(s.MustBeAuthed).Post("/", s.CreateSubmission)
-	})
 
-	r.Route("/submission-tests", func(r chi.Router) {
-		r.With(s.SubmissionCtx).Get("/{submissionId}", s.GetSubmissionTests)
+		r.With(s.SubmissionCtx).Route("/{submissionId}", func(r chi.Router) {
+			r.With(s.SubmissionCtx).Get("/", s.GetSubmissionById)
+			r.Get("/tests", s.GetSubmissionTests)
+		})
 	})
 
 	return r
