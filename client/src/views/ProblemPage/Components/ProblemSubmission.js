@@ -2,6 +2,7 @@ import React, {useState, useEffect} from "react";
 import PropTypes from "prop-types";
 
 import { makeStyles } from '@material-ui/core/styles';
+import { Link } from "react-router-dom";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -120,7 +121,12 @@ const ProblemSubmissions = ({ problem }) => {
                     <TableBody>
                     {submissions.map((row) => (
                         <TableRow key={row.id} style={submissionRowColor(row)}>
-                            <TableCell component="th" scope="row">{row.id}</TableCell>
+                            <TableCell component="th" scope="row">
+                                <Link to={`/submissions/${row.id}`} 
+                                    style={{color: "black", textDecoration: "underline"}}>
+                                    {row.id}
+                                </Link> 
+                            </TableCell>
                             <TableCell>{row.createdAt}</TableCell>
                             <TableCell>{submissionStatus(row)}</TableCell>
                             <TableCell align="right">{submissionScore(row)}</TableCell>

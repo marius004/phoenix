@@ -79,9 +79,10 @@ export default function SubmissionTable({ submissions }) {
           <TableBody>
             {submissions.map((row) => (
               <StyledTableRow key={row.id}>
-                {/* TODO add link to submission */}
                 <StyledTableCell component="th" scope="row">
-                  {row.id}
+                  <Link to={`/submissions/${row.id}`} style={{color: "black", textDecoration: "underline"}}>
+                    {row.id}
+                  </Link> 
                 </StyledTableCell>
                 <StyledTableCell>
                     <img src={`https://www.gravatar.com/avatar/${row.emailHash}?s=25`} alt="user icon"/> {"   "}
