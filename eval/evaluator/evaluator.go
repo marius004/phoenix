@@ -30,6 +30,8 @@ type Evaluator struct {
 
 	config *models.Config
 	logger *log.Logger
+
+	debug bool
 }
 
 func (e *Evaluator) Serve() {
@@ -58,7 +60,7 @@ func (e *Evaluator) Serve() {
 	}
 }
 
-func New(dbIterationTimeout time.Duration, services *eval.EvaluatorServices, config *models.Config) *Evaluator {
+func New(dbIterationTimeout time.Duration, services *eval.EvaluatorServices, config *models.Config, debug bool) *Evaluator {
 	os.Mkdir(config.CompilePath, 0775)
 	os.Mkdir(config.OutputPath, 0755)
 
@@ -74,10 +76,10 @@ func New(dbIterationTimeout time.Duration, services *eval.EvaluatorServices, con
 
 	return &Evaluator{
 		compileChannel: compileChannel,
-		compileHandler: NewCompileHandler(config, logger, compileChannel, services.CompileServices(), sandboxManager),
+		compileHandler: NewCompileHandler(config, logger, compileChannel, services.CompileServices(), sandboxManager, debug),
 
 		executeChannel: executeChannel,
-		executeHandler: NewExecuteHandler(config, logger, executeChannel, services.ExecuteServices(), sandboxManager),
+		executeHandler: NewExecuteHandler(config, logger, executeChannel, services.ExecuteServices(), sandboxManager, debug),
 
 		checkerHandler: NewCheckerHandler(config, logger, checkerChannel, services.CheckerServices()),
 		checkerChannel: checkerChannel,
@@ -92,5 +94,7 @@ func New(dbIterationTimeout time.Duration, services *eval.EvaluatorServices, con
 
 		logger: newLogger(config.Eval.LoggerPath),
 		config: config,
+
+		debug: debug,
 	}
 }

@@ -24,8 +24,8 @@ function getById(id) {
         .then(res => res.data)
 }
 
-function getByUserAndProblem(userId, problemId) {
-    return axios.get(`${config.apiUrl}/submissions?userId=${userId}&problemId=${problemId}`, config.cors)
+function getByUserAndProblem(userId, problem) {
+    return axios.get(`${config.apiUrl}/submissions?userId=${userId}&problem=${problem}`, config.cors)
         .then(res => res.data);
 }
 

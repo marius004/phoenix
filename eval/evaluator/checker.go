@@ -3,6 +3,7 @@ package evaluator
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -104,6 +105,10 @@ func (handler *CheckerHandler) Handle(next chan *models.Submission) {
 					handler.logger.Println(err)
 				}
 
+				continue
+			}
+
+			if submissionTest.ExitCode != 0 {
 				continue
 			}
 

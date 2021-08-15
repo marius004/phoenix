@@ -38,7 +38,7 @@ const ProblemSubmissions = ({ problem }) => {
         const userId = userUtil.getUserId();
 
         try {
-            const submissions = await submissionAPI.getByUserAndProblem(userId, problem.id);  
+            const submissions = await submissionAPI.getByUserAndProblem(userId, problem.name);  
             setSubmissions(submissions);
         } catch(err) {
             console.error(err);

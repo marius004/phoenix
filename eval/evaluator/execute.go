@@ -21,6 +21,8 @@ type ExecuteHandler struct {
 
 	services       *eval.ExecuteServices
 	sandboxManager eval.SandboxManager
+
+	debug bool
 }
 
 // submissionData is the data needed to execute a submission
@@ -82,8 +84,9 @@ func (handler *ExecuteHandler) createExecuteTask(submission *models.Submission, 
 			Input:     input,
 			IsConsole: data.problem.IsConsoleProblem(),
 
-			Lang:       string(submission.Lang),
-			BinaryPath: eval.GetBinaryName(handler.config, int(submission.Id)),
+			ProblemName: data.problem.Name,
+			Lang:        string(submission.Lang),
+			BinaryPath:  eval.GetBinaryName(handler.config, int(submission.Id)),
 		},
 
 		Response: &eval.ExecuteResponse{},
@@ -92,8 +95,13 @@ func (handler *ExecuteHandler) createExecuteTask(submission *models.Submission, 
 	return execute, nil
 }
 
+func (handler *ExecuteHandler) wasTaskExecutedSuccesfully(task *tasks.ExecuteTask) bool {
+	return task.Response.Message == "" && task.Response.ExitCode == 0
+}
+
 func (handler *ExecuteHandler) Handle(next chan *models.Submission) {
 	for submission := range handler.submissions {
+
 		if err := handler.semaphore.Acquire(context.Background(), 1); err != nil {
 			handler.logger.Println(err)
 
@@ -148,15 +156,30 @@ func (handler *ExecuteHandler) Handle(next chan *models.Submission) {
 					continue
 				}
 
-				submissionTest := &models.SubmissionTest{
-					Time:   execute.Response.TimeUsed,
-					Memory: execute.Response.MemoryUsed,
+				var submissionTest *models.SubmissionTest
 
-					Message:  execute.Response.Message,
-					ExitCode: execute.Response.ExitCode,
+				if !handler.wasTaskExecutedSuccesfully(execute) {
+					submissionTest = &models.SubmissionTest{
+						Time:   execute.Response.TimeUsed,
+						Memory: execute.Response.MemoryUsed,
 
-					SubmissionId: uint64(execute.Request.SubmissionId),
-					TestId:       uint64(execute.Request.TestId),
+						Message:  execute.Response.Message,
+						ExitCode: 1, // 1 for everything that did not run properly
+
+						SubmissionId: uint64(execute.Request.SubmissionId),
+						TestId:       uint64(execute.Request.TestId),
+					}
+				} else {
+					submissionTest = &models.SubmissionTest{
+						Time:   execute.Response.TimeUsed,
+						Memory: execute.Response.MemoryUsed,
+
+						Message:  execute.Response.Message,
+						ExitCode: execute.Response.ExitCode,
+
+						SubmissionId: uint64(execute.Request.SubmissionId),
+						TestId:       uint64(execute.Request.TestId),
+					}
 				}
 
 				if err := handler.services.SubmissionTestService.Create(context.Background(), submissionTest); err != nil {
@@ -174,7 +197,7 @@ func (handler *ExecuteHandler) Handle(next chan *models.Submission) {
 }
 
 func NewExecuteHandler(config *models.Config, logger *log.Logger, channel chan *models.Submission,
-	services *eval.ExecuteServices, sandboxManager eval.SandboxManager) *ExecuteHandler {
+	services *eval.ExecuteServices, sandboxManager eval.SandboxManager, debug bool) *ExecuteHandler {
 	return &ExecuteHandler{
 		config: config,
 		logger: logger,
@@ -184,5 +207,7 @@ func NewExecuteHandler(config *models.Config, logger *log.Logger, channel chan *
 
 		services:       services,
 		sandboxManager: sandboxManager,
+
+		debug: debug,
 	}
 }

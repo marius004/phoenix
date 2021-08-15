@@ -44,7 +44,7 @@ func New(db *database.DB, config *models.Config, logger *log.Logger) *API {
 		submissionTestService = db.SubmissionTestService(logger)
 
 		testManager = disk.NewTestManager("tests")
-		evaluator   = evaluator.New(100*time.Millisecond, evaluatorServices(problemService, submissionService, submissionTestService, testService, testManager), config)
+		evaluator   = evaluator.New(100*time.Millisecond, evaluatorServices(problemService, submissionService, submissionTestService, testService, testManager), config, true)
 	)
 
 	return &API{
@@ -102,7 +102,6 @@ func (s *API) Routes() http.Handler {
 					r.With(s.MustBeProposer).Put("/", s.UpdateTestById)
 					r.With(s.MustBeProposer).Delete("/", s.DeleteTestById)
 				})
-
 			})
 		})
 	})

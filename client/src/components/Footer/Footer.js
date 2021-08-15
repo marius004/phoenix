@@ -8,8 +8,6 @@ import classNames from "classnames";
 import { List, ListItem } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
-// @material-ui/icons
-import Favorite from "@material-ui/icons/Favorite";
 import GitHubIcon from '@material-ui/icons/GitHub';
 import InfoIcon from '@material-ui/icons/Info';
 import EmailIcon from '@material-ui/icons/Email';
@@ -35,7 +33,7 @@ export default function Footer(props) {
         <div className={classes.left}>
           <List className={classes.list}>
             <ListItem className={classes.inlineBlock}>
-              <a href="https://github.com/PhoenixAlgo" 
+              <a href="https://github.com/marius004/phoenix" 
                 className={classes.block}
                 target="_blank">
                 <GitHubIcon style={{ fontSize: 16, transform: "translate(0, 2px)" }} /> {"  "}
@@ -50,9 +48,8 @@ export default function Footer(props) {
             </ListItem>
             <ListItem className={classes.inlineBlock}>
               <a
-                href="https://discord.gg/kPjQQYZ4"
+                href="mailto:scarlatmariusstefan2018@gmail.com"
                 className={classes.block}
-                target="_blank"
               >
               <EmailIcon style={{ fontSize: 18, transform: "translate(0, 4px)" }} /> {"  "}
                 Contact

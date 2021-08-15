@@ -20,10 +20,13 @@ type CompileHandler struct {
 
 	services       *eval.CompileServices
 	sandboxManager eval.SandboxManager
+
+	debug bool
 }
 
 func (handler *CompileHandler) Handle(next chan *models.Submission) {
 	for submission := range handler.submissions {
+
 		if err := handler.semaphore.Acquire(context.Background(), 1); err != nil {
 			handler.logger.Println(err)
 
@@ -60,6 +63,7 @@ func (handler *CompileHandler) Handle(next chan *models.Submission) {
 				updateSubmission := &models.UpdateSubmissionRequest{
 					Message: submission.Message,
 				}
+
 				if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), updateSubmission); err != nil {
 					handler.logger.Println(err)
 					return
@@ -93,7 +97,7 @@ func (handler *CompileHandler) Handle(next chan *models.Submission) {
 }
 
 func NewCompileHandler(config *models.Config, logger *log.Logger, channel chan *models.Submission,
-	services *eval.CompileServices, sandboxManager eval.SandboxManager) *CompileHandler {
+	services *eval.CompileServices, sandboxManager eval.SandboxManager, debug bool) *CompileHandler {
 	return &CompileHandler{
 		config: config,
 		logger: logger,
@@ -103,5 +107,7 @@ func NewCompileHandler(config *models.Config, logger *log.Logger, channel chan *
 
 		services:       services,
 		sandboxManager: sandboxManager,
+
+		debug: debug,
 	}
 }

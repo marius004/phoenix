@@ -66,7 +66,7 @@ export default function ProblemCard({problem, submission}) {
         />
         <CardContent>
             <Typography variant="body2" color="textSecondary" component="p">
-                <MDEditor.Markdown style={{marginBottom: "20px"}} source={problem.description} />
+                <MDEditor.Markdown style={{marginBottom: "20px"}} source={problem.shortDescription} />
             </Typography>
         </CardContent>
         <CardActions disableSpacing>
