@@ -11,6 +11,7 @@ import SubmissionFilter from "./Components/SubmissionFilter";
 import { useHistory } from "react-router-dom";
 import SubmissionTable from "./Components/SubmissionTable";
 import Footer from "components/Footer/Footer";
+import Loading from "views/Components/Loading";
 import useQuery from "hooks/query";
 
 import submissionAPI from "api/submission";
@@ -24,6 +25,7 @@ export default function SubmissionsPage() {
     const history = useHistory();
 
     const [submissions, setSubmissions] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const [username, setUsername] = useState("");
     const [problemName, setProblemName] = useState("");
@@ -76,9 +78,10 @@ export default function SubmissionsPage() {
             } else {
                 setSubmissions([]);
             }
-
         } catch(err) {
             console.log(err);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -112,6 +115,10 @@ export default function SubmissionsPage() {
             str.push(`page=${page}`)
 
         return str.join("&")
+    }
+
+    if (loading) {
+        return <Loading/>
     }
 
     return (

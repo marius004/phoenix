@@ -7,7 +7,7 @@ import GridItem from "components/Grid/GridItem.js";
 import Parallax from "components/Parallax/Parallax.js";
 
 import styles from "assets/jss/material-kit-react/views/components.js";
-import SectionFeatures from "./Sections/SectionCards.js";
+import SectionFeatures from "./Components/SectionCards.js";
 import Navbar from "components/Navbar/Navbar.js";
 
 const useStyles = makeStyles(styles);
@@ -25,7 +25,7 @@ export default function Components() {
               <div className={classes.brand}>
                 <h1 className={classes.title}>Phoenix</h1>
                 <h3 
-                  style={{ fontWeight: 400 }} 
+                  style={{ fontWeight: 500 }} 
                   className={classes.subtitle}
                   >
                   O platforma moderna pentru a invata programare

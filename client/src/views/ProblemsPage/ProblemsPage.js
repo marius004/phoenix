@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import styles from "assets/jss/material-kit-react/views/components.js";
 import classNames from "classnames";
 import useQuery from "hooks/query";
-import Problems from "views/Components/Problems";
+import Problems from "views/ProblemsPage/Components/Problems";
 import Footer from "components/Footer/Footer";
 import Loading from "views/Components/Loading";
 
@@ -47,11 +47,13 @@ const ProblemsPage = () => {
         return <Loading/>
     }
 
-    if (fetchingStatus === 404) {
-        return <NotFound/>
+    // 4xx (bad request or not found)
+    if (Math.round(fetchingStatus / 100) == 4) {
+        return <NotFound message="Problema cautata nu a fost gasita"/>   
     }
 
-    if (fetchingStatus === 500) {
+    // 5xx (internal server error)
+    if (Math.round(fetchingStatus / 100) === 5) {
         return <InternalServerError/>
     }
 

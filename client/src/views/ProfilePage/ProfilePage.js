@@ -11,8 +11,11 @@ import Navbar from "components/Navbar/Navbar";
 
 import styles from "assets/jss/material-kit-react/views/profilePage.js";
 import userAPI from "api/user";
-import { unary } from "lodash";
 import userUtil from "util/user";
+
+import Loading from "views/Components/Loading";
+import InternalServerError from "views/Components/InternalServerError";
+import NotFound from "views/Components/NotFound";
 
 const useStyles = makeStyles(styles);
 
@@ -30,6 +33,9 @@ export default function ProfilePage() {
         classes.imgFluid
     );
 
+    const [loading, setLoading] = useState(true);
+    const [fetchingStatus, setFetchingStatus] = useState(200);
+
     const fetchUser = async() => {
         try {
             const user = await userAPI.getByUsername(username);
@@ -39,6 +45,23 @@ export default function ProfilePage() {
             setEmailHash(emailHash);
         } catch(err) {
             console.error(err);
+
+            if (err.message == "Network Error") {
+                setFetchingStatus(500)
+                return;
+            }
+
+            if (err.response.status === 404) {
+                setFetchingStatus(404);
+                return;
+            }
+
+            if (err?.response?.status) {
+                setFetchingStatus(err.response.status);
+                return;
+            }
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -47,6 +70,20 @@ export default function ProfilePage() {
     }
 
     useEffect(fetchUser, []);
+
+    if (loading) {
+        return <Loading/>
+    }
+
+    // 4xx (bad request or not found)
+    if (Math.round(fetchingStatus / 100) == 4) {
+        return <NotFound message="Problema cautata nu a fost gasita"/>   
+    }
+
+    // 5xx (internal server error)
+    if (Math.round(fetchingStatus / 100) === 5) {
+        return <InternalServerError/>
+    }
 
     return (
         <div>

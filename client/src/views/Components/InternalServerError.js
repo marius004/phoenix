@@ -9,10 +9,9 @@ const InternalServerError = () => {
             <h3 style={{textAlign: "center"}}>
                 Contacteaza un admin!! <br/>
                 <a
-                    href="https://discord.gg/kPjQQYZ4"
-                    style={{textAlign: "center", color: "black", fontSize: "1em", fontWeight: "bold"}}
-                    target="_blank">
-                        Discord 
+                    href="mailto:scarlatmariusstefan2018@gmail.com"
+                    style={{textAlign: "center", color: "black", fontSize: "1em", fontWeight: "bold"}}>
+                        scarlatmariusstefan2018@gmail.com
                 </a>
             </h3>
         </div>

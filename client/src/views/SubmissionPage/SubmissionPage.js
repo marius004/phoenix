@@ -15,6 +15,10 @@ import ProblemCard from "./Components/ProblemCard";
 import SubmissionSourceCode from "./Components/SubmissionSourceCode";
 import SubmissionStatus from "./Components/SubmissionStatus";
 
+import Loading from "views/Components/Loading";
+import NotFound from "views/Components/NotFound";
+import InternalServerError from "views/Components/InternalServerError";
+
 const useStyles = makeStyles(styles);
 
 export default function SubmissionPage(props) {
@@ -23,21 +27,57 @@ export default function SubmissionPage(props) {
     const [submission, setSubmission] = useState({});
     const [submissionTests, setSubmissionTests] = useState([]);
 
+    const [loading, setLoading] = useState(true);
+    const [fetchingStatus, setFetchingStatus] = useState(200);
+
     const classes = useStyles();
     const { submissionId } = useParams();  
 
+    // this piece of code might as well be restructured!!
     useEffect(async() => {
+        try {
+            const submission = await submissionAPI.getById(submissionId);
+            const submissionTests = await submissionTestAPI.getBySubmissionId(submissionId);
+            const problem = await problemAPI.getByName(submission.problemName);
 
-        const submission = await submissionAPI.getById(submissionId);
-        const submissionTests = await submissionTestAPI.getBySubmissionId(submissionId);
-        const problem = await problemAPI.getByName(submission.problemName);
+            setProblem(problem);
+            setSubmissionTests(submissionTests);
+            setSubmission(submission);
+        } catch(err) {
+            console.error(err);
 
-        setProblem(problem);
-        setSubmissionTests(submissionTests);
-        setSubmission(submission);
+            if (err.message == "Network Error") {
+                setFetchingStatus(500)
+                return;
+            }
 
-        console.log(problem, submission, submissionTests)
+            if (err.response.status === 404) {
+                setFetchingStatus(404);
+                return;
+            }
+
+            if (err?.response?.status) {
+                setFetchingStatus(err.response.status);
+                return;
+            }
+        } finally {
+            setLoading(false);
+        }
     }, []);
+
+    if (loading) {
+        return <Loading/>
+    }
+
+    // 4xx (bad request or not found)
+    if (Math.round(fetchingStatus / 100) == 4) {
+        return <NotFound message="Problema cautata nu a fost gasita"/>   
+    }
+
+    // 5xx (internal server error)
+    if (Math.round(fetchingStatus / 100) === 5) {
+        return <InternalServerError/>
+    }
 
     const authorProfile = (username) => {
         return `/profile/${username}`

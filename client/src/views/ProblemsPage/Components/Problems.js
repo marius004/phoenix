@@ -5,7 +5,6 @@ import PropTypes from "prop-types";
 import Problem from "./Problem";
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem";
-import ProblemFilter from "./ProblemFilter";
 
 const useStyles = makeStyles(styles);
 

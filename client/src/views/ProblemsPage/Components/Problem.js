@@ -1,10 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
 import MDEditor from '@uiw/react-md-editor';
-import NavPills from "../../components/NavPills/NavPills";
+import NavPills from "components/NavPills/NavPills";
 import Dashboard from "@material-ui/icons/Dashboard";
 import EqualizerIcon from '@material-ui/icons/Equalizer';
-import { Button } from "@material-ui/core";
+import {Button} from "@material-ui/core";
 import {Link} from "react-router-dom";
 
 const Problem = ({problem}) => {

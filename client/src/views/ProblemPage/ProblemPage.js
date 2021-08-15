@@ -21,6 +21,8 @@ import submissionAPI from "api/submission";
 import authenticationUtil from "util/authentication";
 
 import Loading from "views/Components/Loading";
+import InternalServerError from "views/Components/InternalServerError";
+import NotFound from "views/Components/NotFound";
 
 const toastConfig = {
     fontSize: 30,
@@ -59,7 +61,23 @@ const ProblemPage = () => {
             const res = await problemAPI.getByName(problemName);
             setProblem(res);
         } catch (err) {
-          console.error(err);
+            console.error(err);
+
+            if (err.message == "Network Error") {
+                setFetchingStatus(500)
+                return;
+            }
+
+            if (err.response.status === 404) {
+                setFetchingStatus(404);
+                return;
+            }
+
+            if (err?.response?.status) {
+                setFetchingStatus(err.response.status);
+                return;
+            }
+
         } finally {
             setLoading(false);
         }
@@ -120,8 +138,20 @@ const ProblemPage = () => {
 
     useEffect(fetchProblem, []);
 
+    console.log(fetchingStatus);
+
     if (loading) {
         return <Loading/>
+    }
+
+    // 4xx (bad request or not found)
+    if (Math.round(fetchingStatus / 100) == 4) {
+        return <NotFound message="Problema cautata nu a fost gasita"/>   
+    }
+
+    // 5xx (internal server error)
+    if (Math.round(fetchingStatus / 100) === 5) {
+        return <InternalServerError/>
     }
 
     return (

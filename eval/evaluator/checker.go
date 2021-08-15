@@ -3,7 +3,6 @@ package evaluator
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
