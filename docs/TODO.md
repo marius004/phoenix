@@ -20,6 +20,5 @@
   - [ ] Store the IP address of the user making the request.
   - [ ] add the teacher role.
   - [ ] resources/articles for cp, web dev etc.
-  - [ ] get user gravatar from the email.
+  - [x] get user gravatar from the email.
   - [ ] problem hint
-  - [ ] implement file transfer over sockets system for tests and submissions
