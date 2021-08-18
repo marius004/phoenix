@@ -22,9 +22,10 @@ type API struct {
 	config *models.Config
 	logger *log.Logger
 
-	userService    services.UserService
-	problemService services.ProblemService
-	testService    services.TestService
+	userService     services.UserService
+	problemService  services.ProblemService
+	testService     services.TestService
+	blogPostService services.BlogPostService
 
 	submissionService     services.SubmissionService
 	submissionTestService services.SubmissionTestService
@@ -42,6 +43,7 @@ func New(db *database.DB, config *models.Config, logger *log.Logger) *API {
 
 		submissionService     = db.SubmissionService(logger)
 		submissionTestService = db.SubmissionTestService(logger)
+		blogPostService       = db.BlogPostService(logger)
 
 		testManager = disk.NewTestManager("tests")
 		evaluator   = evaluator.New(100*time.Millisecond, evaluatorServices(problemService, submissionService, submissionTestService, testService, testManager), config, true)
@@ -58,6 +60,7 @@ func New(db *database.DB, config *models.Config, logger *log.Logger) *API {
 
 		submissionService:     submissionService,
 		submissionTestService: submissionTestService,
+		blogPostService:       blogPostService,
 
 		testManager: testManager,
 		evaluator:   evaluator,
@@ -118,10 +121,25 @@ func (s *API) Routes() http.Handler {
 		})
 	})
 
+	// TODO test this piece of code
+	r.Route("/posts", func(r chi.Router) {
+
+		r.With(s.MustBeAdmin).Post("/", s.CreateBlogPost)
+
+		// r.With(s.BlogPostCtx).Route("/", func(r chi.Router) {
+		// 	r.Get("/{postId}", s.GetBlogPostById)
+
+		// 	r.With(s.MustBeAdmin).Put("/{postId}", s.UpdateBlogPostById)
+		// 	r.With(s.MustBeAdmin).Delete("/{postId}", s.DeleteBlogPostById)
+		// })
+	})
+
 	return r
 }
 
-func evaluatorServices(problemService services.ProblemService, submissionService services.SubmissionService, submissionTestService services.SubmissionTestService, testService services.TestService, testManager managers.TestManager) *eval.EvaluatorServices {
+func evaluatorServices(problemService services.ProblemService, submissionService services.SubmissionService,
+	submissionTestService services.SubmissionTestService, testService services.TestService,
+	testManager managers.TestManager) *eval.EvaluatorServices {
 	return &eval.EvaluatorServices{
 		ProblemService: problemService,
 

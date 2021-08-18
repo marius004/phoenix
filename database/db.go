@@ -96,3 +96,7 @@ func (db *DB) SubmissionService(logger *log.Logger) services.SubmissionService {
 func (db *DB) SubmissionTestService(logger *log.Logger) services.SubmissionTestService {
 	return NewSubmissionTestService(db.Conn, logger)
 }
+
+func (db *DB) BlogPostService(logger *log.Logger) services.BlogPostService {
+	return NewBlogPostService(db.Conn, logger)
+}

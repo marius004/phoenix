@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -110,6 +111,30 @@ func (s *API) ProblemCtx(next http.Handler) http.Handler {
 		}
 
 		ctx := context.WithValue(r.Context(), util.ProblemContextKey, problem)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+// BlogPostCtx middleware is used to attach the blog post from the URL parameters to the request context.
+func (s *API) BlogPostCtx(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		postId, err := strconv.Atoi(chi.URLParam(r, "postId"))
+
+		fmt.Printf("PostId from middleware %v \n", postId)
+
+		if err != nil {
+			util.DataResponse(w, http.StatusNotFound, "Invalid postId paramter", s.logger)
+			return
+		}
+
+		post, err := s.blogPostService.GetById(r.Context(), postId)
+
+		if err != nil || post == nil {
+			util.DataResponse(w, http.StatusNotFound, "Blog Post not found", s.logger)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), util.BlogPostContextKey, post)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

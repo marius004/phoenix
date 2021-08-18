@@ -14,9 +14,10 @@ import (
 
 // Phoenix is a struct that wraps the functionality of the entire app
 type Phoenix struct {
-	db     *database.DB
+	db  *database.DB
+	api *api.API
+
 	logger *log.Logger
-	api    *api.API
 	config *models.Config
 }
 
@@ -47,7 +48,9 @@ func (p *Phoenix) Run() {
 	})
 
 	r.Use(corsConfig.Handler)
+	r.Get("/", IndexHandler)
 	r.Mount("/api", p.api.Routes())
+	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf("%s:%s", p.config.Server.Host, p.config.Server.Port),

@@ -107,17 +107,13 @@ func (handler *CheckerHandler) Handle(next chan *models.Submission) {
 				continue
 			}
 
-			if submissionTest.ExitCode != 0 {
-				continue
-			}
-
 			if submissionTest.Time > data.problem.TimeLimit {
 				update := &models.UpdateSubmissionTestRequest{
 					Score:  0,
 					Time:   -1, // -1 == skip
 					Memory: -1,
 
-					Message:  "time limit exceeded",
+					Message:  "Time Limit Exceeded",
 					ExitCode: -1,
 				}
 
@@ -128,13 +124,13 @@ func (handler *CheckerHandler) Handle(next chan *models.Submission) {
 				continue
 			}
 
-			if submissionTest.Memory > data.problem.MemoryLimit {
+			if submissionTest.Memory >= data.problem.MemoryLimit {
 				update := &models.UpdateSubmissionTestRequest{
 					Score:  0,
 					Time:   -1, // -1 == skip
 					Memory: -1,
 
-					Message:  "memory limit exceeded",
+					Message:  "Memory Limit Exceeded",
 					ExitCode: -1,
 				}
 
@@ -155,7 +151,7 @@ func (handler *CheckerHandler) Handle(next chan *models.Submission) {
 					Time:   -1, // -1 == skip
 					Memory: -1,
 
-					Message:  "evaluator internal error: could not open the output test file",
+					Message:  "Evaluator Internal Error: Could Not Open The Output Test File",
 					ExitCode: -1,
 				}
 
@@ -195,7 +191,7 @@ func (handler *CheckerHandler) Handle(next chan *models.Submission) {
 					Time:   -1,
 					Memory: -1, // -1 == skip
 
-					Message:  "correct answer",
+					Message:  "Correct Answer",
 					ExitCode: -1,
 				}
 			} else {
@@ -204,7 +200,7 @@ func (handler *CheckerHandler) Handle(next chan *models.Submission) {
 					Time:   -1,
 					Memory: -1, // -1 == skip
 
-					Message:  "wrong answer",
+					Message:  "Wrong Answer",
 					ExitCode: -1,
 				}
 			}

@@ -84,13 +84,13 @@ func (t *ExecuteTask) Run(ctx context.Context, sandbox eval.Sandbox) error {
 
 	switch metaFile.Status {
 	case "TO":
-		t.Response.Message = "TLE: " + metaFile.Message
+		t.Response.Message = metaFile.Message
 	case "RE":
-		t.Response.Message = "Runtime Error: " + metaFile.Message
+		t.Response.Message = metaFile.Message
 	case "SG":
 		t.Response.Message = metaFile.Message
 	case "XX":
-		t.Response.Message = "Sandbox error: " + metaFile.Message
+		t.Response.Message = metaFile.Message
 	}
 
 	if t.Response.ExitCode == 0 {

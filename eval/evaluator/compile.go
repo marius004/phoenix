@@ -7,7 +7,6 @@ import (
 	"github.com/marius004/phoenix/eval"
 	"github.com/marius004/phoenix/eval/tasks"
 	"github.com/marius004/phoenix/models"
-	"golang.org/x/sync/semaphore"
 )
 
 type CompileHandler struct {
@@ -15,7 +14,6 @@ type CompileHandler struct {
 	logger *log.Logger
 
 	// submissions is the channel we receive new submissions from.
-	semaphore   *semaphore.Weighted
 	submissions chan *models.Submission
 
 	services       *eval.CompileServices
@@ -26,73 +24,57 @@ type CompileHandler struct {
 
 func (handler *CompileHandler) Handle(next chan *models.Submission) {
 	for submission := range handler.submissions {
+		handler.logger.Printf("Compiling submission %d\n", submission.Id)
 
-		if err := handler.semaphore.Acquire(context.Background(), 1); err != nil {
+		compile := &tasks.CompileTask{
+			Config: handler.config,
+			Logger: handler.logger,
+
+			Request: &eval.CompileRequest{
+				ID:   int(submission.Id),
+				Lang: string(submission.Lang),
+				Code: []byte(submission.SourceCode),
+			},
+
+			Response: &eval.CompileResponse{},
+		}
+
+		// try to compile
+		if err := handler.sandboxManager.RunTask(context.Background(), compile); err != nil {
 			handler.logger.Println(err)
 
-			updateSubmission := models.NewUpdateSubmissionRequest(0, models.Finished, "unknown evaluator error", &noError)
+			updateSubmission := &models.UpdateSubmissionRequest{
+				Message: submission.Message,
+			}
+
+			if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), updateSubmission); err != nil {
+				handler.logger.Println(err)
+				return
+			}
+		}
+
+		// compilation fail
+		if !compile.Response.Success {
+			updateSubmission := models.NewUpdateSubmissionRequest(0, models.Finished, compile.Response.Message, &hasError)
 			if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), updateSubmission); err != nil {
 				handler.logger.Println(err)
 			}
-
-			continue
+			return
 		}
 
-		handler.logger.Printf("Compiling submission %d\n", submission.Id)
-
-		go func(submission *models.Submission) {
-			defer handler.semaphore.Release(1)
-
-			compile := &tasks.CompileTask{
-				Config: handler.config,
-				Logger: handler.logger,
-
-				Request: &eval.CompileRequest{
-					ID:   int(submission.Id),
-					Lang: string(submission.Lang),
-					Code: []byte(submission.SourceCode),
-				},
-
-				Response: &eval.CompileResponse{},
-			}
-
-			// try to compile
-			if err := handler.sandboxManager.RunTask(context.Background(), compile); err != nil {
+		if compile.Response.Message != "" {
+			update := &models.UpdateSubmissionRequest{Message: compile.Response.Message}
+			if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), update); err != nil {
 				handler.logger.Println(err)
-
-				updateSubmission := &models.UpdateSubmissionRequest{
-					Message: submission.Message,
-				}
-
-				if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), updateSubmission); err != nil {
-					handler.logger.Println(err)
-					return
-				}
 			}
+		}
 
-			// compilation fail
-			if !compile.Response.Success {
-				updateSubmission := models.NewUpdateSubmissionRequest(0, models.Finished, compile.Response.Message, &hasError)
-				if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), updateSubmission); err != nil {
-					handler.logger.Println(err)
-				}
-				return
-			}
-
-			if compile.Response.Message != "" {
-				update := &models.UpdateSubmissionRequest{Message: compile.Response.Message}
-				if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), update); err != nil {
-					handler.logger.Println(err)
-				}
-			}
-
-			// succesful compilation
-			// this means that we will send the submission to the next handler(if one is present)
-			// (in this case send the submission to be executed)
-			if next != nil {
-				next <- submission
-			}
-		}(submission)
+		// succesful compilation
+		// this means that we will send the submission to the next handler(if one is present)
+		// (in this case send the submission to be executed)
+		if next != nil {
+			next <- submission
+		}
 	}
 }
 
@@ -102,7 +84,6 @@ func NewCompileHandler(config *models.Config, logger *log.Logger, channel chan *
 		config: config,
 		logger: logger,
 
-		semaphore:   semaphore.NewWeighted(int64(config.MaxSandboxes)),
 		submissions: channel,
 
 		services:       services,

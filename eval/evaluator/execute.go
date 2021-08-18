@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"sync"
 
 	"github.com/marius004/phoenix/eval"
 	"github.com/marius004/phoenix/eval/tasks"
@@ -96,51 +97,42 @@ func (handler *ExecuteHandler) createExecuteTask(submission *models.Submission, 
 }
 
 func (handler *ExecuteHandler) wasTaskExecutedSuccesfully(task *tasks.ExecuteTask) bool {
-	return task.Response.Message == "" && task.Response.ExitCode == 0
+	return task.Response.ExitCode == 0
 }
 
 func (handler *ExecuteHandler) Handle(next chan *models.Submission) {
 	for submission := range handler.submissions {
 
-		if err := handler.semaphore.Acquire(context.Background(), 1); err != nil {
-			handler.logger.Println(err)
+		handler.logger.Printf("Executing submission %d\n", submission.Id)
+		data := handler.getSubmissionData(submission)
 
-			updateSubmission := models.NewUpdateSubmissionRequest(0, models.Finished, "unknown evaluator error", &noError)
+		if data.err != nil {
+			updateSubmission := models.NewUpdateSubmissionRequest(0, models.Finished, "evaluator error: "+data.err.Error(), &noError)
 			if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), updateSubmission); err != nil {
 				handler.logger.Println(err)
 			}
-
-			continue
+			return
 		}
 
-		go func(submission *models.Submission) {
-			defer handler.semaphore.Release(1)
+		var wg sync.WaitGroup
 
-			handler.logger.Printf("Executing submission %d\n", submission.Id)
-			data := handler.getSubmissionData(submission)
+		for _, test := range data.tests {
 
-			if data.err != nil {
-				updateSubmission := models.NewUpdateSubmissionRequest(0, models.Finished, "evaluator error: "+data.err.Error(), &noError)
-				if err := handler.services.SubmissionService.Update(context.Background(), int(submission.Id), updateSubmission); err != nil {
-					handler.logger.Println(err)
-				}
-				return
-			}
+			wg.Add(1)
 
-			for _, test := range data.tests {
+			go func(test *models.Test) {
+				defer wg.Done()
 				execute, err := handler.createExecuteTask(submission, data, test)
 
 				if err != nil {
 					handler.logger.Println(err)
 
 					submissionTest := models.NewSubmissionTest(submission.Id, test.Id)
-					submission.Message = "internal evaluator error: could not execute test"
-
 					if err := handler.services.SubmissionTestService.Create(context.Background(), submissionTest); err != nil {
 						handler.logger.Println(err)
 					}
 
-					continue
+					return
 				}
 
 				if err := handler.sandboxManager.RunTask(context.Background(), execute); err != nil {
@@ -153,7 +145,20 @@ func (handler *ExecuteHandler) Handle(next chan *models.Submission) {
 						handler.logger.Println(err)
 					}
 
-					continue
+					return
+				}
+
+				if err := handler.sandboxManager.RunTask(context.Background(), execute); err != nil {
+					handler.logger.Println(err)
+
+					submissionTest := models.NewSubmissionTest(submission.Id, test.Id)
+					submissionTest.Message = "internal evaluator error: could not execute test"
+
+					if err := handler.services.SubmissionTestService.Create(context.Background(), submissionTest); err != nil {
+						handler.logger.Println(err)
+					}
+
+					return
 				}
 
 				var submissionTest *models.SubmissionTest
@@ -164,7 +169,7 @@ func (handler *ExecuteHandler) Handle(next chan *models.Submission) {
 						Memory: execute.Response.MemoryUsed,
 
 						Message:  execute.Response.Message,
-						ExitCode: 1, // 1 for everything that did not run properly
+						ExitCode: execute.Response.ExitCode,
 
 						SubmissionId: uint64(execute.Request.SubmissionId),
 						TestId:       uint64(execute.Request.TestId),
@@ -184,15 +189,17 @@ func (handler *ExecuteHandler) Handle(next chan *models.Submission) {
 
 				if err := handler.services.SubmissionTestService.Create(context.Background(), submissionTest); err != nil {
 					handler.logger.Println(err)
-					continue
+					return
 				}
-			}
 
-			if next != nil {
-				next <- submission
-			}
+			}(test)
+		}
 
-		}(submission)
+		wg.Wait()
+
+		if next != nil {
+			next <- submission
+		}
 	}
 }
 

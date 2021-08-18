@@ -9,9 +9,10 @@ import (
 type ContextType string
 
 const (
-	UserContextKey    = ContextType("user")
-	ProblemContextKey = ContextType("problem")
-	TestContextKey    = ContextType("test")
+	UserContextKey     = ContextType("user")
+	ProblemContextKey  = ContextType("problem")
+	TestContextKey     = ContextType("test")
+	BlogPostContextKey = ContextType("blog-post")
 
 	SubmissionContextKey     = ContextType("submission")
 	SubmissionTestContextKey = ContextType("submissionTest")
@@ -71,6 +72,17 @@ func SubmissionTestFromRequestContext(r *http.Request) *models.SubmissionTest {
 		return &submissionTest
 	case *models.SubmissionTest:
 		return submissionTest
+	default:
+		return nil
+	}
+}
+
+func BlogPostFromRequestContext(r *http.Request) *models.BlogPost {
+	switch blogPost := r.Context().Value(BlogPostContextKey).(type) {
+	case models.BlogPost:
+		return &blogPost
+	case *models.BlogPost:
+		return blogPost
 	default:
 		return nil
 	}

@@ -1,10 +1,14 @@
 package phoenix
 
 import (
+	"fmt"
+	"html/template"
+	"log"
+	"net/http"
+	"os"
+
 	"github.com/marius004/phoenix/database"
 	"github.com/marius004/phoenix/models"
-	"log"
-	"os"
 )
 
 func newLogger(path string) *log.Logger {
@@ -14,7 +18,7 @@ func newLogger(path string) *log.Logger {
 	}
 
 	logger := &log.Logger{}
-	logger.SetFlags(log.LstdFlags|log.Ldate|log.Llongfile)
+	logger.SetFlags(log.LstdFlags | log.Ldate | log.Llongfile)
 	logger.SetOutput(file)
 
 	return logger
@@ -39,4 +43,19 @@ func newDatabase(config *models.Config, logger *log.Logger) *database.DB {
 
 	db.RunMigrations(logger)
 	return db
+}
+
+func IndexHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles("./templates/index.html")
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	tmpl.Execute(w, nil)
+}
+
+func staticServer(path string) http.Handler {
+	return http.FileServer(http.Dir(path))
 }
