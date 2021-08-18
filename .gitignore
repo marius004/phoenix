@@ -8,5 +8,7 @@ eval.txt
 #datastore
 tests
 
+static
+
 #editor 
 .vscode
