@@ -45,7 +45,7 @@
     "@babel/preset-react": "7.14.5",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-prettier": "3.4.0",
-    "eslint-plugin-react": "7.24.0",
+    "eslint-plugin-react": "7.25.1",
     "gulp": "4.0.2",
     "gulp-append-prepend": "1.0.9",
     "prettier": "2.3.2"
