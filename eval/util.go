@@ -4,33 +4,18 @@ import (
 	"bytes"
 	"context"
 	"io"
-	"math/rand"
 	"strconv"
-	"strings"
 
-	"github.com/marius004/phoenix/models"
+	"github.com/marius004/phoenix/internal"
+	"github.com/marius004/phoenix/internal/models"
 )
 
-const randomCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-
-func RandomString(size int) string {
-	sb := strings.Builder{}
-	sb.Grow(size)
-
-	for ; size > 0; size-- {
-		randIndex := rand.Intn(len(randomCharacters))
-		sb.WriteByte(randomCharacters[randIndex])
-	}
-
-	return sb.String()
-}
-
-func CompileFile(ctx context.Context, sandbox Sandbox, sourceCode []byte, lang models.Language) (string, error) {
+func CompileFile(ctx context.Context, sandbox internal.Sandbox, sourceCode []byte, lang internal.Language) (string, error) {
 	if err := sandbox.WriteToFile(lang.SourceFile, sourceCode, 0644); err != nil {
 		return "", err
 	}
 
-	var runConf RunConfig
+	var runConf internal.RunConfig
 
 	out := &bytes.Buffer{}
 
@@ -45,7 +30,7 @@ func CompileFile(ctx context.Context, sandbox Sandbox, sourceCode []byte, lang m
 	return out.String(), nil
 }
 
-func CopyFromSandbox(sandbox Sandbox, path string, w io.Writer) error {
+func CopyFromSandbox(sandbox internal.Sandbox, path string, w io.Writer) error {
 	content, err := sandbox.ReadFile(path)
 
 	if err != nil {
@@ -59,19 +44,19 @@ func CopyFromSandbox(sandbox Sandbox, path string, w io.Writer) error {
 	return nil
 }
 
-func CopyInSandbox(sandbox Sandbox, path string, data []byte) error {
+func CopyInSandbox(sandbox internal.Sandbox, path string, data []byte) error {
 	return sandbox.WriteToFile(path, data, 7777)
 }
 
-func ExecuteFile(ctx context.Context, sandbox Sandbox, lang models.Language, problemName string, limit Limit, console bool) (*RunStatus, error) {
-	var runConf RunConfig
+func ExecuteFile(ctx context.Context, sandbox internal.Sandbox, lang internal.Language, problemName string, limit internal.Limit, console bool) (*internal.RunStatus, error) {
+	var runConf internal.RunConfig
 
 	// limit stuff
 	runConf.MaxProcesses = 10
 	runConf.MemoryLimit = limit.Memory
 	runConf.TimeLimit = limit.Time
 	runConf.StackLimit = limit.Stack
-	runConf.WallTimeLimit = 10 // should be enough for now
+	runConf.WallTimeLimit = 2 * limit.Time // should be enough for now
 
 	runConf.InputPath = problemName + ".in"
 	runConf.OutputPath = problemName + ".out"
@@ -79,14 +64,14 @@ func ExecuteFile(ctx context.Context, sandbox Sandbox, lang models.Language, pro
 	return sandbox.ExecuteCommand(ctx, lang.Execute, &runConf)
 }
 
-func GetBinaryName(config *models.Config, submissionId int) string {
+func GetBinaryName(config *internal.Config, submissionId int) string {
 	return config.CompilePath + "/" + strconv.Itoa(submissionId) + ".bin"
 }
 
-func GetOutputFileName(config *models.Config, submission *models.Submission, test *models.Test) string {
+func GetOutputFileName(config *internal.Config, submission *models.Submission, test *models.Test) string {
 	return config.OutputPath + "/s" + strconv.Itoa(int(submission.Id)) + "t" + strconv.Itoa(int(test.Id)) + ".out"
 }
 
-func CompiledSourceCode(sandbox Sandbox, fileName string) bool {
+func CompiledSourceCode(sandbox internal.Sandbox, fileName string) bool {
 	return sandbox.FileExists(fileName)
 }

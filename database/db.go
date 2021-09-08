@@ -8,11 +8,10 @@ import (
 	"io/fs"
 	"log"
 
-	"github.com/marius004/phoenix/models"
-
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
-	"github.com/marius004/phoenix/services"
+	"github.com/marius004/phoenix/internal"
+	"github.com/marius004/phoenix/internal/services"
 )
 
 //go:embed psql_schema
@@ -34,7 +33,7 @@ func NewPSQL(dsn string) (*DB, error) {
 }
 
 // DefaultDatabase returns an instance of a psql database
-func DefaultDatabase(config *models.Config) (*DB, error) {
+func DefaultDatabase(config *internal.Config) (*DB, error) {
 	var (
 		host   = config.Database.Host
 		port   = config.Database.Port
@@ -95,8 +94,4 @@ func (db *DB) SubmissionService(logger *log.Logger) services.SubmissionService {
 
 func (db *DB) SubmissionTestService(logger *log.Logger) services.SubmissionTestService {
 	return NewSubmissionTestService(db.Conn, logger)
-}
-
-func (db *DB) BlogPostService(logger *log.Logger) services.BlogPostService {
-	return NewBlogPostService(db.Conn, logger)
 }

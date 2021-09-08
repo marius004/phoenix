@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/marius004/phoenix/models"
-	"github.com/marius004/phoenix/util"
+	"github.com/marius004/phoenix/internal/models"
+	"github.com/marius004/phoenix/internal/util"
 )
 
 // GetProblems is the handler behind GET /api/problems/

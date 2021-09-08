@@ -11,6 +11,7 @@ import ProfilePage from "views/ProfilePage/ProfilePage";
 import SubmissionsPage from "views/SubmissionsPage/SubmissionsPage";
 import SubmissionPage from "views/SubmissionPage/SubmissionPage";
 import ProblemsPage from "views/ProblemsPage/ProblemsPage";
+// import RequireAuth from "components/Authorization/RequireAuth";
 
 const hist = createBrowserHistory();
 

@@ -57,7 +57,7 @@ export default function SubmissionStatus({ submission, submissionTests }) {
                             <TableBody>
                             {submissionTests.map((test, indx) => (
                                 <TableRow key={test.id} style={rowStyle(test)}>
-                                    <TableCell component="th" scope="row">{test.id}</TableCell>
+                                    <TableCell component="th" scope="row">{indx + 1}</TableCell>
                                     <TableCell>{test.time.toFixed(3)}</TableCell>
                                     <TableCell>{test.memory} KB</TableCell>
                                     <TableCell>{test.message ? test.message : "-"}</TableCell>

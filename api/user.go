@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/marius004/phoenix/util"
+	"github.com/marius004/phoenix/internal/util"
 )
 
 // GetUserByUserName is the handler behind GET /api/users/{username}

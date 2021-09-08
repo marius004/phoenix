@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/marius004/phoenix/models"
-	"github.com/marius004/phoenix/util"
+	"github.com/marius004/phoenix/internal/models"
+	"github.com/marius004/phoenix/internal/util"
 )
 
 const (

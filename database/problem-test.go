@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/marius004/phoenix/models"
+	"github.com/marius004/phoenix/internal/models"
 )
 
 // TestService implements services.TestService

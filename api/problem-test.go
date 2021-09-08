@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/marius004/phoenix/models"
-	"github.com/marius004/phoenix/util"
+	"github.com/marius004/phoenix/internal/models"
+	"github.com/marius004/phoenix/internal/util"
 )
 
 // CreateTest is the handler behind POST /api/tests/

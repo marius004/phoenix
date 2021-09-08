@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 
-	"github.com/marius004/phoenix/models"
 	"github.com/jmoiron/sqlx"
+	"github.com/marius004/phoenix/internal/models"
 )
 
 // UserService implements services.UserService

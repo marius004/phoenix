@@ -2,32 +2,30 @@ package tasks
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"os"
 	"path"
 
 	"github.com/marius004/phoenix/eval"
-	"github.com/marius004/phoenix/models"
+	"github.com/marius004/phoenix/internal"
 )
 
 type CompileTask struct {
-	Config *models.Config
+	Config *internal.Config
 	Logger *log.Logger
 
-	Request  *eval.CompileRequest
-	Response *eval.CompileResponse
+	Request  *internal.CompileRequest
+	Response *internal.CompileResponse
 }
 
-func (task *CompileTask) Run(ctx context.Context, sandbox eval.Sandbox) error {
+func (task *CompileTask) Run(ctx context.Context, sandbox internal.Sandbox) error {
 	task.Logger.Printf("Compiling using sandbox %d\n", sandbox.GetID())
-
 	lang, ok := task.Config.Languages[task.Request.Lang]
 
 	if !ok {
 		task.Logger.Printf("Invalid language %s\n", task.Request.Lang)
-		return errors.New("no language found")
+		return internal.ErrLangNotFound
 	}
 
 	binaryPath := path.Join(task.Config.CompilePath, fmt.Sprintf("%d.bin", task.Request.ID))

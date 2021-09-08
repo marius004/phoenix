@@ -2,7 +2,6 @@ package tasks
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -10,24 +9,24 @@ import (
 	"path"
 
 	"github.com/marius004/phoenix/eval"
-	"github.com/marius004/phoenix/models"
+	"github.com/marius004/phoenix/internal"
 )
 
 type ExecuteTask struct {
-	Config *models.Config
+	Config *internal.Config
 	Logger *log.Logger
 
-	Request  *eval.ExecuteRequest
-	Response *eval.ExecuteResponse
+	Request  *internal.ExecuteRequest
+	Response *internal.ExecuteResponse
 }
 
-func (t *ExecuteTask) Run(ctx context.Context, sandbox eval.Sandbox) error {
+func (t *ExecuteTask) Run(ctx context.Context, sandbox internal.Sandbox) error {
 	t.Logger.Printf("Executing using sandbox %d\n", sandbox.GetID())
 	lang, ok := t.Config.Languages[t.Request.Lang]
 
 	if !ok {
 		t.Logger.Printf("Invalid language %s\n", t.Request.Lang)
-		return errors.New("no language found")
+		return internal.ErrLangNotFound
 	}
 
 	if err := sandbox.WriteToFile("box/"+t.Request.ProblemName+".in", t.Request.Input, 0644); err != nil {
@@ -65,7 +64,7 @@ func (t *ExecuteTask) Run(ctx context.Context, sandbox eval.Sandbox) error {
 		return err
 	}
 
-	limit := eval.Limit{
+	limit := internal.Limit{
 		Time: t.Request.Time,
 
 		Memory: t.Request.Memory,

@@ -5,37 +5,33 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/marius004/phoenix/eval"
-	"github.com/marius004/phoenix/eval/evaluator"
-	"github.com/marius004/phoenix/managers"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/jmoiron/sqlx"
 	"github.com/marius004/phoenix/database"
-	"github.com/marius004/phoenix/disk"
-	"github.com/marius004/phoenix/models"
-	"github.com/marius004/phoenix/services"
+	"github.com/marius004/phoenix/eval/grader"
+	"github.com/marius004/phoenix/internal"
+	"github.com/marius004/phoenix/internal/services"
+	"github.com/marius004/phoenix/managers"
 )
 
 type API struct {
 	db     *sqlx.DB
-	config *models.Config
+	config *internal.Config
 	logger *log.Logger
 
-	userService     services.UserService
-	problemService  services.ProblemService
-	testService     services.TestService
-	blogPostService services.BlogPostService
+	userService    services.UserService
+	problemService services.ProblemService
+	testService    services.TestService
 
 	submissionService     services.SubmissionService
 	submissionTestService services.SubmissionTestService
 
-	evaluator   *evaluator.Evaluator
-	testManager managers.TestManager
+	grader      *grader.Grader
+	testManager *managers.TestManager
 }
 
 // New declares a new API instance
-func New(db *database.DB, config *models.Config, logger *log.Logger) *API {
+func New(db *database.DB, config *internal.Config, logger *log.Logger) *API {
 	var (
 		userService    = db.UserService(logger)
 		problemService = db.ProblemService(logger)
@@ -43,10 +39,10 @@ func New(db *database.DB, config *models.Config, logger *log.Logger) *API {
 
 		submissionService     = db.SubmissionService(logger)
 		submissionTestService = db.SubmissionTestService(logger)
-		blogPostService       = db.BlogPostService(logger)
 
-		testManager = disk.NewTestManager("tests")
-		evaluator   = evaluator.New(100*time.Millisecond, evaluatorServices(problemService, submissionService, submissionTestService, testService, testManager), config, true)
+		testManager = managers.NewTestManager("tests")
+
+		graderServices = evaluatorServices(problemService, submissionService, submissionTestService, testService, *testManager)
 	)
 
 	return &API{
@@ -60,10 +56,9 @@ func New(db *database.DB, config *models.Config, logger *log.Logger) *API {
 
 		submissionService:     submissionService,
 		submissionTestService: submissionTestService,
-		blogPostService:       blogPostService,
 
 		testManager: testManager,
-		evaluator:   evaluator,
+		grader:      grader.NewGrader(100*time.Millisecond, graderServices, config, logger),
 	}
 }
 
@@ -72,6 +67,7 @@ func (s *API) Routes() http.Handler {
 	r := chi.NewRouter()
 
 	r.Use(s.UserCtx)
+	go s.grader.Handle()
 
 	r.Route("/users", func(r chi.Router) {
 		r.With(s.MustBeAdmin).Get("/", s.GetAllUsers)
@@ -109,8 +105,6 @@ func (s *API) Routes() http.Handler {
 		})
 	})
 
-	go s.evaluator.Serve()
-
 	r.Route("/submissions", func(r chi.Router) {
 		r.Get("/", s.GetSubmissions)
 		r.With(s.MustBeAuthed).Post("/", s.CreateSubmission)
@@ -121,26 +115,13 @@ func (s *API) Routes() http.Handler {
 		})
 	})
 
-	// TODO test this piece of code
-	r.Route("/posts", func(r chi.Router) {
-
-		r.With(s.MustBeAdmin).Post("/", s.CreateBlogPost)
-
-		// r.With(s.BlogPostCtx).Route("/", func(r chi.Router) {
-		// 	r.Get("/{postId}", s.GetBlogPostById)
-
-		// 	r.With(s.MustBeAdmin).Put("/{postId}", s.UpdateBlogPostById)
-		// 	r.With(s.MustBeAdmin).Delete("/{postId}", s.DeleteBlogPostById)
-		// })
-	})
-
 	return r
 }
 
 func evaluatorServices(problemService services.ProblemService, submissionService services.SubmissionService,
 	submissionTestService services.SubmissionTestService, testService services.TestService,
-	testManager managers.TestManager) *eval.EvaluatorServices {
-	return &eval.EvaluatorServices{
+	testManager managers.TestManager) *internal.EvaluatorServices {
+	return &internal.EvaluatorServices{
 		ProblemService: problemService,
 
 		SubmissionService:     submissionService,

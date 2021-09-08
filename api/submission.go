@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/marius004/phoenix/models"
-	"github.com/marius004/phoenix/util"
+	"github.com/marius004/phoenix/internal/models"
+	"github.com/marius004/phoenix/internal/util"
 )
 
 // GetSubmissions is the handler behind GET /api/submissions/

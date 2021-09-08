@@ -3,7 +3,7 @@ package api
 import (
 	"net/http"
 
-	"github.com/marius004/phoenix/util"
+	"github.com/marius004/phoenix/internal/util"
 )
 
 // GET /api/submission-tests/{submissionId}

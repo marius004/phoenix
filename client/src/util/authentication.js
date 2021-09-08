@@ -26,4 +26,20 @@ function isUserLoggedIn() {
     return authToken != null && authToken.token != null;
 }
 
+// TODO
+// function isUserAdmin() {
+//     if (!isUserLoggedIn())
+//         return false;
+
+//     const authToken = getAuthToken();
+//     return authToken.
+// }
+
+// function isUserProposer() {
+// }
+
+// function isNormalUser() {
+
+// }
+
 export default authenticationUtil;
