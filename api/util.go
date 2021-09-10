@@ -1,11 +1,14 @@
 package api
 
 import (
+	"crypto/md5"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/marius004/phoenix/internal/models"
@@ -131,4 +134,15 @@ func convertUrlValuesToStatusArr(values []string) []models.SubmissionStatus {
 	}
 
 	return statuses
+}
+
+// https://en.gravatar.com/site/implement/hash/
+func (s *API) calculateEmailHash(email string) string {
+	email = strings.TrimSpace(email)
+	email = strings.ToLower(email)
+
+	hash := md5.Sum([]byte(email))
+	str := hex.EncodeToString(hash[:])
+
+	return str
 }

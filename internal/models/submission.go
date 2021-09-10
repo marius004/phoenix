@@ -31,12 +31,6 @@ type Submission struct {
 	ProblemId  int    `json:"problemId" db:"problem_id"`
 	UserId     int    `json:"userId" db:"user_id"`
 	SourceCode string `json:"sourceCode" db:"source_code"`
-
-	// I know it is not a good practice to do something like this
-	// but I hope I will restructure this in the future
-	Username    string `json:"username"`
-	EmailHash   string `json:"emailHash"`
-	ProblemName string `json:"problemName"`
 }
 
 var (

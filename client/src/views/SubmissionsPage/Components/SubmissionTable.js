@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import { withStyles, makeStyles } from '@material-ui/core/styles';
+import React, {useEffect, useState} from 'react';
+import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -9,6 +9,8 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import PropTypes from "prop-types";
 import { Link } from 'react-router-dom';
+import problemAPI from 'api/problem';
+import avatarAPI from 'api/avatar';
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -28,36 +30,100 @@ const StyledTableRow = withStyles((theme) => ({
   },
 }))(TableRow);
 
-export default function SubmissionTable({ submissions }) {
-    const submissionDate = (time) => {
-      const date = new Date(time);
+const SubmissionRow = ({ submission }) => {
+  const [problem, setProblem] = useState({name: ""});
+  const [avatar, setAvatar] = useState("");
+  const [username, setUsername] = useState("");
+
+  const submissionDate = (time) => {
+    const date = new Date(time);
+    
+    const year  = date.getFullYear();
+    const month = date.getMonth() < 10 ? "0" + date.getMonth() : date.getMonth();
+    const day   = date.getDay() < 10 ? "0" + date.getDay() : date.getDay();
+
+    return day + "/" + month + "/" + year;
+  }
+
+  const submissionTime = (time) => {
+    const date = new Date(time);
+    
+    const hour = date.getHours() < 10 ? "0" +  date.getHours() : date.getHours();
+    const min  = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+
+    return hour + ":" + min;
+  }
+
+  const submissionStatus = (submission) => {
+    if (submission.status == "waiting")
+        return "Waiting";
+    if(submission.status == "working")
+        return "Evaluating";
+    if (submission.hasCompileError)
+        return "Compilation Error";
+    return `Evaluated: ${submission.score}`
+  }
+
+  const fetchProblem = async () => {
+    try {
+      const problem = await problemAPI.getById(submission.problemId);
+      if (problem == null || problem.length == 0)
+        return;
       
-      const year  = date.getFullYear();
-      const month = date.getMonth() < 10 ? "0" + date.getMonth() : date.getMonth();
-      const day   = date.getDay() < 10 ? "0" + date.getDay() : date.getDay();
-
-      return day + "/" + month + "/" + year;
+      setProblem(problem[0]);
+    } catch(err) {
+      console.error(err)
     }
+  }
 
-    const submissionTime = (time) => {
-      const date = new Date(time);
-      
-      const hour = date.getHours() < 10 ? "0" +  date.getHours() : date.getHours();
-      const min  = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
-
-      return hour + ":" + min;
+  const fetchAvatar = async() => {
+    try {
+      const res = await avatarAPI.get(submission.userId, 25);
+      setAvatar(res.image);
+      setUsername(res.username);
+    }catch(err) {
+      console.error(err);
     }
+  }
   
-    const submissionStatus = (submission) => {
-      if (submission.status == "waiting")
-          return "Waiting";
-      if(submission.status == "working")
-          return "Evaluating";
-      if (submission.hasCompileError)
-          return "Compilation Error";
-      return `Evaluated: ${submission.score}`
-    }
+  useEffect(async() => {
+    const problem = fetchProblem();
+    const avatar  = fetchAvatar();
+    Promise.all([problem, avatar]);
+  }, []);
 
+  return (
+    <StyledTableRow>
+      <StyledTableCell component="th" scope="row">
+        <Link to={`/submissions/${submission.id}`} style={{color: "black", textDecoration: "underline"}}>
+          {submission.id}
+        </Link> 
+      </StyledTableCell>
+      <StyledTableCell>
+        <img src={`data:image/png;base64,${avatar}`} alt="user icon"/> {"   "}
+        {username}
+      </StyledTableCell>
+      <StyledTableCell>
+        {submissionDate(submission.createdAt)} 
+        {"    "}
+        {submissionTime(submission.createdAt)}
+      </StyledTableCell>
+      <StyledTableCell>
+        {problem && problem.name && 
+        <Link to={`/problems/${problem.name}`} style={{color: "black", textDecoration: "underline"}}>
+          {problem.name}
+        </Link>
+        }
+      </StyledTableCell>
+      <StyledTableCell align="right">
+        {submissionStatus(submission)}
+      </StyledTableCell>
+    </StyledTableRow>
+  );
+}
+
+export default function SubmissionTable({ submissions }) {
+  
     if (submissions.length === 0) {
       return <h3 style={{textAlign: "center"}}>No submission</h3>
     }
@@ -78,28 +144,7 @@ export default function SubmissionTable({ submissions }) {
           </TableHead>
           <TableBody>
             {submissions.map((row) => (
-              <StyledTableRow key={row.id}>
-                <StyledTableCell component="th" scope="row">
-                  <Link to={`/submissions/${row.id}`} style={{color: "black", textDecoration: "underline"}}>
-                    {row.id}
-                  </Link> 
-                </StyledTableCell>
-                <StyledTableCell>
-                    <img src={`https://www.gravatar.com/avatar/${row.emailHash}?s=25`} alt="user icon"/> {"   "}
-                    {row.username}
-                </StyledTableCell>
-                <StyledTableCell>
-                  {submissionDate(row.createdAt)} 
-                  {"    "}
-                  {submissionTime(row.createdAt)}
-                </StyledTableCell>
-                <StyledTableCell>
-                  <Link to={`/problems/${row.problemName}`} style={{color: "black", textDecoration: "underline"}}>
-                    {row.problemName}
-                  </Link>
-                </StyledTableCell>
-                <StyledTableCell align="right">{submissionStatus(row)}</StyledTableCell>
-              </StyledTableRow>
+              <SubmissionRow key={row.id} submission={row}/>
             ))}
           </TableBody>
         </Table>

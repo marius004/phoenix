@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/marius004/phoenix/internal/models"
 	"github.com/marius004/phoenix/internal/util"
@@ -130,6 +131,13 @@ func (s *API) DeleteByName(w http.ResponseWriter, r *http.Request) {
 
 func (s *API) parseProblemFilter(r *http.Request) *models.ProblemFilter {
 	ret := models.ProblemFilter{}
+
+	if v, ok := r.URL.Query()["id"]; ok {
+		id, err := strconv.Atoi(v[0])
+		if err == nil {
+			ret.ID = id
+		}
+	}
 
 	if v, ok := r.URL.Query()["authorId"]; ok {
 		ret.AuthorsId = convertUrlValuesToInt(v)

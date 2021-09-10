@@ -153,10 +153,13 @@ func (s *ProblemService) ExistsById(ctx context.Context, id int) (bool, error) {
 	return count > 0, err
 }
 
-// RESTRUCTURE THIS PIECE OF CODE ACCORDING TO DRY!!
 func (s *ProblemService) filterMaker(filter *models.ProblemFilter) ([]string, []interface{}) {
 	var query []string
 	var args []interface{}
+
+	if id := filter.ID; id > 0 {
+		query, args = append(query, "id = ?"), append(args, id)
+	}
 
 	if authors := filter.AuthorsId; len(authors) > 0 {
 

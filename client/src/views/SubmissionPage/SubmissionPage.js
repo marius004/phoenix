@@ -9,6 +9,7 @@ import styles from "assets/jss/material-kit-react/views/components.js";
 import classNames from "classnames";
 
 import submissionAPI from "api/submission";
+import avatarAPI from "api/avatar";
 import submissionTestAPI from "api/submission-test";
 import problemAPI from "api/problem";
 import ProblemCard from "./Components/ProblemCard";
@@ -26,6 +27,7 @@ export default function SubmissionPage(props) {
     const [problem, setProblem] = useState({});
     const [submission, setSubmission] = useState({});
     const [submissionTests, setSubmissionTests] = useState([]);
+    const [avatar, setAvatar] = useState({ image: "", username:"" })
 
     const [loading, setLoading] = useState(true);
     const [fetchingStatus, setFetchingStatus] = useState(200);
@@ -33,16 +35,17 @@ export default function SubmissionPage(props) {
     const classes = useStyles();
     const { submissionId } = useParams();  
 
-    // this piece of code might as well be restructured!!
     useEffect(async() => {
         try {
             const submission = await submissionAPI.getById(submissionId);
             const submissionTests = await submissionTestAPI.getBySubmissionId(submissionId);
-            const problem = await problemAPI.getByName(submission.problemName);
+            const problem = await problemAPI.getById(submission.problemId);
+            const avatar = await avatarAPI.get(submission.userId, 25)
 
-            setProblem(problem);
+            setProblem(problem[0]);
             setSubmissionTests(submissionTests);
             setSubmission(submission);
+            setAvatar(avatar);
         } catch(err) {
             console.error(err);
 
@@ -91,8 +94,9 @@ export default function SubmissionPage(props) {
                     <Grid item xl={2} md={3} xs={12} style={{textAlign: "center"}}>
                         <h3>Submission #{submission.id}</h3>
                         <h3>Author: {"  "}
-                            <a style={{color: "inherit", textDecoration: "underline"}} href={authorProfile(submission.username)}>
-                                {submission.username}
+                            <a style={{color: "inherit", textDecoration: "underline"}} href={authorProfile(avatar.username)}>
+                                {avatar.username} {"   "}
+                                <img src={`data:image/png;base64,${avatar.image}`} alt="user icon"/>
                             </a>    
                         </h3>
                         <h3>Score: {submission.score}</h3>

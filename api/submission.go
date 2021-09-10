@@ -18,19 +18,6 @@ func (s *API) GetSubmissions(w http.ResponseWriter, r *http.Request) {
 	filter := s.parseSubmissionFilter(r)
 	submissions, err := s.submissionService.GetByFilter(r.Context(), filter)
 
-	// I know it is not a good practice to do something like this
-	// but I hope I will restructure this in the future
-	for _, submission := range submissions {
-		if problem, err := s.problemService.GetById(r.Context(), submission.ProblemId); err == nil {
-			submission.ProblemName = problem.Name
-		}
-
-		if user, err := s.userService.GetById(r.Context(), submission.UserId); err == nil {
-			submission.EmailHash = s.calculateEmailHash(user.Email)
-			submission.Username = user.Username
-		}
-	}
-
 	if err != nil {
 		s.logger.Println(err)
 		util.EmptyResponse(w, http.StatusBadRequest)
@@ -43,16 +30,6 @@ func (s *API) GetSubmissions(w http.ResponseWriter, r *http.Request) {
 // GetSubmissions is the handler behind GET /api/submissions/{submissionId}
 func (s *API) GetSubmissionById(w http.ResponseWriter, r *http.Request) {
 	submission := util.SubmissionFromRequestContext(r)
-
-	if problem, err := s.problemService.GetById(r.Context(), submission.ProblemId); err == nil {
-		submission.ProblemName = problem.Name
-	}
-
-	if user, err := s.userService.GetById(r.Context(), submission.UserId); err == nil {
-		submission.EmailHash = s.calculateEmailHash(user.Email)
-		submission.Username = user.Username
-	}
-
 	util.DataResponse(w, http.StatusOK, submission, s.logger)
 }
 

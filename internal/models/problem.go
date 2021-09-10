@@ -71,6 +71,8 @@ func (p Problem) IsConsoleProblem() bool {
 }
 
 type ProblemFilter struct {
+	ID int
+
 	AuthorsId    []int
 	Difficulties []string
 	Credits      []string
