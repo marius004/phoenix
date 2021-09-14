@@ -22,7 +22,7 @@ const (
 )
 
 func (s *API) canManageProblemResources(r *http.Request, problem *models.Problem) bool {
-	user := util.UserFromRequestContext(r)
+	user := util.UserFromRequestContext(r.Context())
 
 	if user == nil || problem == nil {
 		return false
@@ -40,14 +40,14 @@ func (s *API) canManageProblemResources(r *http.Request, problem *models.Problem
 }
 
 func (s *API) canSeeSubmissionSourceCode(r *http.Request, submission *models.Submission, problem *models.Problem) bool {
-	user := util.UserFromRequestContext(r)
+	user := util.UserFromRequestContext(r.Context())
 	return util.IsRAdmin(r) ||
 		s.canProposerSeeSourceCode(r, problem) ||
 		(uint64(submission.UserId) == user.Id)
 }
 
 func (s *API) canProposerSeeSourceCode(r *http.Request, problem *models.Problem) bool {
-	user := util.UserFromRequestContext(r)
+	user := util.UserFromRequestContext(r.Context())
 	return util.IsRProposer(r) && user != nil && problem.AuthorId == user.Id
 }
 

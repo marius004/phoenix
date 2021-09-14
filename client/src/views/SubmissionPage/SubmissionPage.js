@@ -38,10 +38,16 @@ export default function SubmissionPage(props) {
     useEffect(async() => {
         try {
             const submission = await submissionAPI.getById(submissionId);
-            const submissionTests = await submissionTestAPI.getBySubmissionId(submissionId);
             const problem = await problemAPI.getById(submission.problemId);
+            const submissionTests = await submissionTestAPI.getBySubmissionId(submissionId);
             const avatar = await avatarAPI.get(submission.userId, 25)
 
+            console.log("submission", submission);
+            console.log("problem", problem[0]);
+            console.log("submissionTests", submissionTests);
+            console.log("avatar", avatar);
+
+            
             setProblem(problem[0]);
             setSubmissionTests(submissionTests);
             setSubmission(submission);

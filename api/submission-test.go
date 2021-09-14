@@ -8,7 +8,7 @@ import (
 
 // GET /api/submission-tests/{submissionId}
 func (s *API) GetSubmissionTests(w http.ResponseWriter, r *http.Request) {
-	submission := util.SubmissionFromRequestContext(r)
+	submission := util.SubmissionFromRequestContext(r.Context())
 	submissionTests, err := s.submissionTestService.GetBySubmissionId(r.Context(), submission.Id)
 
 	if err != nil {
@@ -21,6 +21,6 @@ func (s *API) GetSubmissionTests(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *API) GetSubmissionTestById(w http.ResponseWriter, r *http.Request) {
-	submissionTest := util.SubmissionFromRequestContext(r)
+	submissionTest := util.SubmissionFromRequestContext(r.Context())
 	util.DataResponse(w, http.StatusOK, submissionTest, s.logger)
 }

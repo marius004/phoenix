@@ -55,7 +55,7 @@ const ProblemSubmissions = ({ problem }) => {
 
     useEffect(fetchSubmissions, []);
 
-    if (submissions.length === 0) {
+    if (submissions == null || submissions.length === 0) {
         return (
             <div className={classes.container}>
                 <h3 style={{textAlign: "center"}}>No submission yet!</h3>

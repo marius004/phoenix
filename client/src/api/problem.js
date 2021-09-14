@@ -6,6 +6,9 @@ const problemAPI = {
     getById,
     getByName,
     getAll,
+    create,
+    update,
+    delete: deleteProblem,
 };
 
 function getByQuery(query) {
@@ -26,6 +29,22 @@ function getByName(name) {
 function getAll() {
     return axios.get(`${config.apiUrl}/problems`, config.cors)
         .then(res => res.data)
+}
+
+function create(problem) {
+    return axios.post(`${config.apiUrl}/problems`, problem, 
+        config.cors).then(res => res.data);
+}
+
+function update(problemName, data) {
+    console.log(problemName);
+    return axios.put(`${config.apiUrl}/problems/${problemName}`, data, 
+        config.cors).then(res => res.data);
+}
+
+function deleteProblem(problemName) {
+    return axios.delete(`${config.apiUrl}/problems/${problemName}`, 
+        config.cors).then(res => res.data);
 }
 
 export default problemAPI;

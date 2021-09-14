@@ -29,13 +29,13 @@ func (s *API) GetSubmissions(w http.ResponseWriter, r *http.Request) {
 
 // GetSubmissions is the handler behind GET /api/submissions/{submissionId}
 func (s *API) GetSubmissionById(w http.ResponseWriter, r *http.Request) {
-	submission := util.SubmissionFromRequestContext(r)
+	submission := util.SubmissionFromRequestContext(r.Context())
 	util.DataResponse(w, http.StatusOK, submission, s.logger)
 }
 
 // CreateSubmission is the handler behind POST /api/submissions/
 func (s *API) CreateSubmission(w http.ResponseWriter, r *http.Request) {
-	user := util.UserFromRequestContext(r)
+	user := util.UserFromRequestContext(r.Context())
 	var data models.CreateSubmissionRequest
 
 	jsonDecoder := json.NewDecoder(r.Body)

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 
 import Navbar from "components/Navbar/Navbar";
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -23,6 +23,7 @@ import authenticationUtil from "util/authentication";
 import Loading from "views/Components/Loading";
 import InternalServerError from "views/Components/InternalServerError";
 import NotFound from "views/Components/NotFound";
+import problemUtil from "util/problem";
 
 const toastConfig = {
     fontSize: 30,
@@ -136,10 +137,12 @@ const ProblemPage = () => {
         }
     }
 
+    const editProblemLink = () => {
+        return `/problems/${problem.name}/edit`;
+    }
+
     useEffect(fetchProblem, []);
-
-    console.log(fetchingStatus);
-
+    
     if (loading) {
         return <Loading/>
     }
@@ -176,8 +179,17 @@ const ProblemPage = () => {
                         {
                             tabButton: "Description",
                             tabContent: (
-                                <div style={{border: "1px solid #bdbdbd", padding: "20px"}}>
-                                    <MDEditor.Markdown style={{marginBottom: "20px"}} source={problem.description} />
+                                <div style={{border: "1px solid #bdbdbd", padding: "12px"}}>
+                                    {problemUtil.canUserEditProblem(problem) &&
+                                        <h3>
+                                            Problema {problem.name} {"  "}
+                                            <a style={{color: "blue"}} href={editProblemLink()}>[EDIT]</a>
+                                        </h3>
+                                    }
+                                    {!problemUtil.canUserEditProblem(problem) &&
+                                        <h3>Problema {problem.name}</h3>
+                                    }
+                                    <MDEditor.Markdown style={{marginBottom: "12px"}} source={problem.description} />
                                 </div>
                             )
                         },

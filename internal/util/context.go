@@ -1,7 +1,7 @@
 package util
 
 import (
-	"net/http"
+	"context"
 
 	"github.com/marius004/phoenix/internal/models"
 )
@@ -19,8 +19,8 @@ const (
 )
 
 // UserFromRequestContext returns a pointer to the user from request context
-func UserFromRequestContext(r *http.Request) *models.User {
-	switch usr := r.Context().Value(UserContextKey).(type) {
+func UserFromRequestContext(context context.Context) *models.User {
+	switch usr := context.Value(UserContextKey).(type) {
 	case models.User:
 		return &usr
 	case *models.User:
@@ -31,8 +31,8 @@ func UserFromRequestContext(r *http.Request) *models.User {
 }
 
 // ProblemFromRequestContext returns a pointer to the problem from request context
-func ProblemFromRequestContext(r *http.Request) *models.Problem {
-	switch prb := r.Context().Value(ProblemContextKey).(type) {
+func ProblemFromRequestContext(context context.Context) *models.Problem {
+	switch prb := context.Value(ProblemContextKey).(type) {
 	case models.Problem:
 		return &prb
 	case *models.Problem:
@@ -43,8 +43,8 @@ func ProblemFromRequestContext(r *http.Request) *models.Problem {
 }
 
 // TestFromRequestContext returns a pointer to the test from request context
-func TestFromRequestContext(r *http.Request) *models.Test {
-	switch test := r.Context().Value(TestContextKey).(type) {
+func TestFromRequestContext(context context.Context) *models.Test {
+	switch test := context.Value(TestContextKey).(type) {
 	case models.Test:
 		return &test
 	case *models.Test:
@@ -55,8 +55,8 @@ func TestFromRequestContext(r *http.Request) *models.Test {
 }
 
 // SubmissionFromRequestContext returns a pointer to the file-managers from request context
-func SubmissionFromRequestContext(r *http.Request) *models.Submission {
-	switch submission := r.Context().Value(SubmissionContextKey).(type) {
+func SubmissionFromRequestContext(context context.Context) *models.Submission {
+	switch submission := context.Value(SubmissionContextKey).(type) {
 	case models.Submission:
 		return &submission
 	case *models.Submission:
@@ -66,8 +66,8 @@ func SubmissionFromRequestContext(r *http.Request) *models.Submission {
 	}
 }
 
-func SubmissionTestFromRequestContext(r *http.Request) *models.SubmissionTest {
-	switch submissionTest := r.Context().Value(SubmissionTestContextKey).(type) {
+func SubmissionTestFromRequestContext(context context.Context) *models.SubmissionTest {
+	switch submissionTest := context.Value(SubmissionTestContextKey).(type) {
 	case models.SubmissionTest:
 		return &submissionTest
 	case *models.SubmissionTest:

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"sync"
 	"time"
 
@@ -254,6 +255,9 @@ func (g *Grader) executeSubmission(submission *models.Submission) bool {
 
 func NewGrader(interval time.Duration, services *internal.EvaluatorServices, config *internal.Config, logger *log.Logger) *Grader {
 	manager := sandbox.NewManager(config, logger)
+
+	os.Mkdir(config.CompilePath, 0777)
+	os.Mkdir(config.OutputPath, 0777)
 
 	return &Grader{
 		iterationInterval: interval,

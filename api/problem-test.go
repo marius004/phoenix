@@ -10,7 +10,7 @@ import (
 
 // CreateTest is the handler behind POST /api/tests/
 func (s *API) CreateTest(w http.ResponseWriter, r *http.Request) {
-	problem := util.ProblemFromRequestContext(r)
+	problem := util.ProblemFromRequestContext(r.Context())
 	var data models.CreateTestRequest
 
 	jsonDecoder := json.NewDecoder(r.Body)
@@ -53,8 +53,8 @@ func (s *API) CreateTest(w http.ResponseWriter, r *http.Request) {
 
 // UpdateTestById is the handler behind PUT /api/tests/
 func (s *API) UpdateTestById(w http.ResponseWriter, r *http.Request) {
-	problem := util.ProblemFromRequestContext(r)
-	test := util.TestFromRequestContext(r)
+	problem := util.ProblemFromRequestContext(r.Context())
+	test := util.TestFromRequestContext(r.Context())
 
 	var data models.UpdateTestRequest
 
@@ -102,7 +102,7 @@ func (s *API) UpdateTestById(w http.ResponseWriter, r *http.Request) {
 
 // GetTestById is the handler behind GET /api/tests/{testId}
 func (s *API) GetTestById(w http.ResponseWriter, r *http.Request) {
-	test := util.TestFromRequestContext(r)
+	test := util.TestFromRequestContext(r.Context())
 
 	problem, err := s.problemService.GetById(r.Context(), test.ProblemId)
 	if err != nil || problem == nil {
@@ -134,8 +134,8 @@ func (s *API) GetTestById(w http.ResponseWriter, r *http.Request) {
 
 // DeleteTestById is the handler behind DELETE /api/tests/{testId}
 func (s *API) DeleteTestById(w http.ResponseWriter, r *http.Request) {
-	problem := util.ProblemFromRequestContext(r)
-	test := util.TestFromRequestContext(r)
+	problem := util.ProblemFromRequestContext(r.Context())
+	test := util.TestFromRequestContext(r.Context())
 
 	if !s.canManageProblemResources(r, problem) {
 		util.ErrorResponse(w, http.StatusUnauthorized, "You cannot delete this test!", s.logger)
@@ -166,7 +166,7 @@ func (s *API) DeleteTestById(w http.ResponseWriter, r *http.Request) {
 // GetProblemTests is the handler behind GET /api/tests/{problemName}
 // Returns all the tests for the specified problem
 func (s *API) GetProblemTests(w http.ResponseWriter, r *http.Request) {
-	problem := util.ProblemFromRequestContext(r)
+	problem := util.ProblemFromRequestContext(r.Context())
 	tests, err := s.testService.GetAllProblemTests(r.Context(), int(problem.Id))
 
 	if err != nil {

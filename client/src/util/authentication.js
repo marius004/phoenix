@@ -4,6 +4,8 @@ import base64 from "base-64";
 const authenticationUtil = {
     getAuthToken,
     isUserLoggedIn,
+    isUserAdmin,
+    isUserProposer,
 }
 
 function getAuthToken() {
@@ -26,20 +28,20 @@ function isUserLoggedIn() {
     return authToken != null && authToken.token != null;
 }
 
-// TODO
-// function isUserAdmin() {
-//     if (!isUserLoggedIn())
-//         return false;
+function isUserAdmin() {
+    if (!isUserLoggedIn())
+        return false;
 
-//     const authToken = getAuthToken();
-//     return authToken.
-// }
+    const authToken = getAuthToken();
+    return authToken?.user?.isAdmin == true;
+}
 
-// function isUserProposer() {
-// }
+function isUserProposer() {
+    if (!isUserLoggedIn())
+        return false;
 
-// function isNormalUser() {
-
-// }
+    const authToken = getAuthToken();
+    return (authToken?.user?.isAdmin === true || authToken?.user?.isProposer === true);
+}
 
 export default authenticationUtil;

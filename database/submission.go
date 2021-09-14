@@ -126,7 +126,7 @@ func (s *SubmissionService) filterMaker(filter *models.SubmissionFilter) ([]stri
 	var query []string
 	var args []interface{}
 
-	if v := filter.UserId; v != 0 {
+	if v := filter.UserId; v > 0 {
 		query, args = append(query, "user_id = ?"), append(args, v)
 	}
 

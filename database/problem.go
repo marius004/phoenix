@@ -10,6 +10,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/marius004/phoenix/internal/models"
+	"github.com/marius004/phoenix/internal/util"
 )
 
 // ProblemService implements services.ProblemService
@@ -29,13 +30,14 @@ func (s *ProblemService) GetByFilter(ctx context.Context, filter *models.Problem
 	queryList, args := s.filterMaker(filter)
 
 	if len(queryList) == 0 {
-		if err := s.db.Select(&problems, "SELECT * FROM problems"); err != nil {
+		if err := s.db.Select(&problems, "SELECT * FROM problems WHERE visible = true"); err != nil {
 			return nil, err
 		}
 		return problems, nil
 	}
 
 	query := s.db.Rebind(fmt.Sprintf("SELECT * FROM problems WHERE %s", strings.Join(queryList, " AND ")))
+
 	if err := s.db.Select(&problems, query, args...); err != nil {
 		return nil, err
 	}
@@ -57,7 +59,7 @@ func (s *ProblemService) GetById(ctx context.Context, id int) (*models.Problem, 
 
 func (s *ProblemService) GetAll(ctx context.Context) ([]*models.Problem, error) {
 	var problems []*models.Problem
-	err := s.db.Select(&problems, "SELECT * FROM problems")
+	err := s.db.Select(&problems, "SELECT * FROM problems WHERE visible = true")
 
 	if err != nil {
 		s.logger.Println(err)
@@ -67,16 +69,29 @@ func (s *ProblemService) GetAll(ctx context.Context) ([]*models.Problem, error) 
 	return problems, err
 }
 
-func (s *ProblemService) GetByName(ctx context.Context, name string) (*models.Problem, error) {
-	var problem models.Problem
-	err := s.db.GetContext(ctx, &problem, s.db.Rebind("SELECT * FROM problems WHERE name = ? LIMIT 1"), name)
+func canSeeUnvisibleProblem(user *models.User, problem *models.Problem) bool {
+	if user == nil {
+		return false
+	}
 
+	return user.IsAdmin || user.Id == problem.AuthorId
+}
+
+func (s *ProblemService) GetByName(ctx context.Context, name string) (*models.Problem, error) {
+	problem := &models.Problem{}
+
+	err := s.db.GetContext(ctx, problem, s.db.Rebind("SELECT * FROM problems WHERE name = ? LIMIT 1"), name)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		s.logger.Println(err)
 		return nil, err
 	}
 
-	return &problem, err
+	user := util.UserFromRequestContext(ctx)
+	if !problem.Visible && !canSeeUnvisibleProblem(user, problem) {
+		problem = nil
+	}
+
+	return problem, err
 }
 
 func (s *ProblemService) Create(ctx context.Context, problem *models.Problem, authorId int) error {

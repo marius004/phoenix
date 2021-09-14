@@ -12,6 +12,7 @@ import MenuBookIcon from '@material-ui/icons/MenuBook';
 import authenticationAPI from "api/authentication";
 import authenticationUtil from "util/authentication";
 import userUtil from "util/user";
+import { Divider } from "@material-ui/core";
 
 const useStyles = makeStyles(styles);
 
@@ -31,6 +32,56 @@ export default function HeaderLinks(props) {
 
   const redirectToProfilePage = () => {
     window.location.href = getUserProfileLink();
+  }
+
+  const authedUserLinks = () => {
+    const links = [
+      <ListItem className={classes.listItem}>
+        <Button
+            onClick={redirectToProfilePage} 
+            className={classes.dropdownLink} 
+            style={{ paddingLeft: "8px", paddingRight: "8px"}} 
+            color="transparent">
+          <i style={{ fontSize: "18px", marginRight: "4px" }} className="fa fa-user" aria-hidden="true"></i>
+          Profile
+        </Button>
+      </ListItem>
+    ];
+
+    if(authenticationUtil.isUserProposer()) {
+      links.push(
+        <Divider/>,
+        <ListItem className={classes.listItem}>
+          <Button className={classes.dropdownLink} style={{ paddingLeft: "8px", paddingRight: "8px"}} color="transparent" onClick={() => window.location.href = "/proposer"}>
+          <i style={{ fontSize: "18px", marginRight: "4px" }} className="fa fa-pencil" aria-hidden="true"></i>
+            Proposer Panel
+          </Button>
+        </ListItem>,
+      );
+    }
+
+    if(authenticationUtil.isUserAdmin()) {
+      links.push(
+        <ListItem className={classes.listItem}>
+          <Button className={classes.dropdownLink} style={{ paddingLeft: "8px", paddingRight: "8px"}} color="transparent" onClick={() => window.location.href = "/admin"}>
+          <i style={{ fontSize: "18px", marginRight: "4px" }} className="fa fa-shield" aria-hidden="true"></i>
+            Admin Panel
+          </Button>
+        </ListItem>,
+      );
+    }
+
+    links.push(
+      <Divider/>,
+      <ListItem className={classes.listItem}>
+        <Button className={classes.dropdownLink} style={{ paddingLeft: "8px", paddingRight: "8px"}} color="transparent" onClick={() => handleLogout()}>
+          <i style={{ fontSize: "18px", marginRight: "4px" }} className="fa fa-sign-out"></i>
+          Log out
+        </Button>
+      </ListItem>
+    );
+
+    return links;
   }
 
   return (
@@ -116,24 +167,7 @@ export default function HeaderLinks(props) {
             color: "transparent",
           }}
           buttonIcon={PermIdentity}
-          dropdownList={[
-            <ListItem className={classes.listItem}>
-              <Button
-                  onClick={redirectToProfilePage} 
-                  className={classes.dropdownLink} 
-                  style={{ paddingLeft: "8px", paddingRight: "8px"}} 
-                  color="transparent">
-                <i style={{ fontSize: "18px", marginRight: "4px" }} className="fa fa-user" aria-hidden="true"></i>
-                Profile
-              </Button>
-            </ListItem>,
-            <ListItem className={classes.listItem}>
-              <Button className={classes.dropdownLink} style={{ paddingLeft: "8px", paddingRight: "8px"}} color="transparent" onClick={() => handleLogout()}>
-                <i style={{ fontSize: "18px", marginRight: "4px" }} className="fa fa-sign-out"></i>
-                Log out
-              </Button>
-          </ListItem>,
-          ]}
+          dropdownList={authedUserLinks()}
         />
         </ListItem> 
       }

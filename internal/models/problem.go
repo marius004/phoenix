@@ -42,7 +42,7 @@ var (
 	problemMemoryLimitValidation      = []validation.Rule{validation.Required, validation.Min(0), validation.Max(65537)}
 	problemStackLimitValidation       = []validation.Rule{validation.Required, validation.Min(0), validation.Max(16384)}
 	problemSourceSizeValidation       = []validation.Rule{validation.Required, validation.Min(0), validation.Max(10000)}
-	problemStreamValidation           = []validation.Rule{validation.In(CONSOLE, FILE)}
+	problemStreamValidation           = []validation.Rule{validation.In(CONSOLE)}
 	problemCreditsValidation          = []validation.Rule{validation.Length(0, 100)}
 )
 
@@ -89,7 +89,7 @@ type UpdateProblemRequest struct {
 	Difficulty       ProblemDifficulty `json:"difficulty"`
 	Grade            ProblemGrade      `json:"grade"`
 	Credits          string            `json:"credits"`
-	Stream           StreamFlag        `json:"stream"` // TODO the validation is broken
+	Stream           StreamFlag        `json:"stream"`
 
 	TimeLimit   float64 `json:"timeLimit"`
 	MemoryLimit int     `json:"memoryLimit"`
@@ -101,7 +101,6 @@ type CreateProblemRequest struct {
 	Name             string            `json:"name"`
 	Description      string            `json:"description"`
 	ShortDescription string            `json:"shortDescription"`
-	Visible          bool              `json:"visible"`
 	Difficulty       ProblemDifficulty `json:"difficulty"`
 	Grade            ProblemGrade      `json:"grade"`
 	Credits          string            `json:"credits"`
@@ -116,17 +115,13 @@ type CreateProblemRequest struct {
 func (data CreateProblemRequest) Validate() error {
 	return validation.ValidateStruct(&data,
 		validation.Field(&data.Name, problemNameValidation...),
-		validation.Field(&data.Description, problemDescriptionValidation...),
-		validation.Field(&data.ShortDescription, problemShortDescriptionValidation...),
-		validation.Field(&data.Visible, problemVisibilityValidation...),
-		validation.Field(&data.Difficulty, problemDifficultyValidation...),
-		validation.Field(&data.Grade, problemGradeValidation...),
 		validation.Field(&data.TimeLimit, problemTimeLimitValidation...),
+		validation.Field(&data.Difficulty, problemDifficultyValidation...),
 		validation.Field(&data.MemoryLimit, problemMemoryLimitValidation...),
-		validation.Field(&data.SourceSize, problemSourceSizeValidation...),
 		validation.Field(&data.StackLimit, problemStackLimitValidation...),
 		validation.Field(&data.Credits, problemCreditsValidation...),
 		validation.Field(&data.Stream, problemStreamValidation...),
+		validation.Field(&data.Grade, problemGradeValidation...),
 	)
 }
 
@@ -135,7 +130,7 @@ func NewProblem(request CreateProblemRequest) *Problem {
 		Name:             request.Name,
 		Description:      request.Description,
 		ShortDescription: request.ShortDescription,
-		Visible:          request.Visible,
+		Visible:          false,
 		Difficulty:       request.Difficulty,
 		Grade:            request.Grade,
 		Credits:          request.Credits,

@@ -11,6 +11,7 @@ import PropTypes from "prop-types";
 import { Link } from 'react-router-dom';
 
 import userAPI from 'api/user';
+import avatarAPI from 'api/avatar';
 
 const useStyles = makeStyles({
   gravatar: {
@@ -20,19 +21,15 @@ const useStyles = makeStyles({
 
 export default function ProblemTable({ data }) {
   const classes = useStyles();
-  const [gravatarData, setGravatarData] = useState({})
+  const [avatar, setAvatar] = useState({image: "", username: ""})
 
   const fetchGravatarData = async() => {
     try {
-      const gravatar = await userAPI.getGravatar(data.authorId);
-      setGravatarData(gravatar);
+      const avatar = await avatarAPI.get(data.authorId, 25);
+      setAvatar(avatar);
     } catch(err) {
       console.error(err);
     }
-  }
-
-  const getGravatarURI = (imgSize) => {
-    return `https://www.gravatar.com/avatar/${gravatarData.emailHash}?s=${imgSize}`;
   }
 
   useEffect(fetchGravatarData, [])
@@ -55,9 +52,9 @@ export default function ProblemTable({ data }) {
         <TableBody>
         <TableRow key={data.id}>
             <TableCell component="th" scope="row">
-              <Link to={() => `/profile/${gravatarData.username}`} style={{color: "blue"}}>
-                <img className={classes.gravatar} src={getGravatarURI(22)}/>
-                {"  "}{gravatarData.username} 
+              <Link to={() => `/profile/${avatar.username}`} style={{color: "blue"}}>
+              <img src={`data:image/png;base64,${avatar.image}`} alt="user icon"/> {"   "}
+                {"  "}{avatar.username} 
               </Link>
             </TableCell>
             <TableCell align="right">{data.grade}</TableCell>

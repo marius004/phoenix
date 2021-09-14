@@ -29,7 +29,7 @@ func (s *API) GetProblems(w http.ResponseWriter, r *http.Request) {
 
 // GetProblemByName is the handler behind GET /api/problems/{problemName}
 func (s *API) GetProblemByName(w http.ResponseWriter, r *http.Request) {
-	problem := util.ProblemFromRequestContext(r)
+	problem := util.ProblemFromRequestContext(r.Context())
 	util.DataResponse(w, http.StatusOK, problem, s.logger)
 }
 
@@ -56,7 +56,7 @@ func (s *API) CreateProblem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	author := util.UserFromRequestContext(r)
+	author := util.UserFromRequestContext(r.Context())
 
 	problem := models.NewProblem(data)
 	err := s.problemService.Create(r.Context(), problem, int(author.Id))
@@ -73,13 +73,16 @@ func (s *API) CreateProblem(w http.ResponseWriter, r *http.Request) {
 // CreateProblem is the handler behind PUT /api/problems/{problemName}
 func (s *API) UpdateProblemByName(w http.ResponseWriter, r *http.Request) {
 
-	problem := util.ProblemFromRequestContext(r)
+	problem := util.ProblemFromRequestContext(r.Context())
 	if !s.canManageProblemResources(r, problem) {
 		util.ErrorResponse(w, http.StatusInternalServerError, "you cannot update this problem", s.logger)
 		return
 	}
 
 	var data models.UpdateProblemRequest
+	if data.Visible && !util.IsRAdmin(r) {
+		data.Visible = false
+	}
 
 	jsonDecoder := json.NewDecoder(r.Body)
 	jsonDecoder.DisallowUnknownFields()
@@ -108,7 +111,7 @@ func (s *API) UpdateProblemByName(w http.ResponseWriter, r *http.Request) {
 
 // CreateProblem is the handler behind DELETE /api/problems/{problemName}
 func (s *API) DeleteByName(w http.ResponseWriter, r *http.Request) {
-	problem := util.ProblemFromRequestContext(r)
+	problem := util.ProblemFromRequestContext(r.Context())
 	if !s.canManageProblemResources(r, problem) {
 		util.ErrorResponse(w, http.StatusUnauthorized, "You cannot delete a problem", s.logger)
 		return
