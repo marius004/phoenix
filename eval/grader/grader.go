@@ -145,6 +145,8 @@ func (g *Grader) handleGraderInternalErr(submission *models.Submission, message 
 
 func (g *Grader) executeTest(submission *models.Submission, problem *models.Problem, test *models.Test) (*tasks.ExecuteTask, error) {
 	input, err := g.services.TestManager.GetInputTest(uint(test.Id), problem.Name)
+	fmt.Printf("---%s---", string(input))
+	g.logger.Printf("---%s---", string(input))
 
 	if err != nil {
 		g.logger.Println(err)
@@ -201,6 +203,8 @@ func (g *Grader) executeSubmission(submission *models.Submission) bool {
 
 		go func(test models.Test) {
 			defer wg.Done()
+
+			defer fmt.Println(test)
 
 			execute, err := g.executeTest(submission, problem, &test)
 			if err != nil {

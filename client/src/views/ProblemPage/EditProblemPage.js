@@ -12,6 +12,9 @@ import Unauthorized from "views/Components/Unauthorized";
 import problemUtil from "util/problem";
 import NavPills from "components/NavPills/NavPills.js";
 import GeneralEditTab from "./EditTabs/GeneralEditTab";
+import DescriptionEditTab from "./EditTabs/DescriptionEditTab";
+import ShortDescriptionEditTab from "./EditTabs/ShortDescriptionEditTab";
+import CreateTestEditTab from "./EditTabs/CreateTestEditTab";
 
 export default function EditProblemPage() {
     const {problemName} = useParams();
@@ -74,7 +77,7 @@ export default function EditProblemPage() {
     <div>
         <CssBaseline/>
         <Navbar color="white" fixed ={false}/> 
-        <Container style={{border: "1px solid grey", marginTop: "100px"}}>
+        <Container style={{border: "1px solid grey", marginTop: "100px", marginBottom: "50px"}}>
             <h3>
                 Editare Problema  {"  "}
                 <Link to={problemLink} style={{color: "blue"}}>{problemName}</Link>
@@ -87,8 +90,17 @@ export default function EditProblemPage() {
                     },
                     {
 
-                        
+                        tabButton: "Descriere",
+                        tabContent: <DescriptionEditTab problem={problem} setProblem={setProblem}/>,
                     },
+                    {
+                        tabButton: "Descriere scurta",
+                        tabContent: <ShortDescriptionEditTab problem={problem} setProblem={setProblem}/>,
+                    }, 
+                    {
+                        tabButton: "Creare test",
+                        tabContent: <CreateTestEditTab problem={problem} />,
+                    }
                 ]}
             />
         </Container>

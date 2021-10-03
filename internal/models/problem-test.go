@@ -22,8 +22,8 @@ type Test struct {
 
 type CreateTestRequest struct {
 	Score  int    `json:"score"`
-	Input  []byte `json:"input"`
-	Output []byte `json:"output"`
+	Input  string `json:"input"`
+	Output string `json:"output"`
 }
 
 func (data CreateTestRequest) Validate() error {

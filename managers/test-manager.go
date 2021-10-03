@@ -1,6 +1,8 @@
 package managers
 
-import "strconv"
+import (
+	"strconv"
+)
 
 // TestManager implements services.TestManager
 type TestManager struct {

@@ -2,6 +2,7 @@ package checker
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -33,6 +34,7 @@ func (c *Checker) handleCheckerInternalErr(submission *models.Submission, messag
 
 func (c *Checker) openSubmissionOutputFile(submission *models.Submission, test *models.Test) ([]byte, error) {
 	path := eval.GetOutputFileName(c.config, submission, test)
+	fmt.Println("PATH:", path)
 	file, err := os.OpenFile(path, os.O_RDONLY, 0664)
 
 	if err != nil {
@@ -52,6 +54,9 @@ func (c *Checker) parseString(str string) string {
 func (c *Checker) isValidAnswer(received, expected []byte) bool {
 	receivedStr := c.parseString(string(received))
 	expectedStr := c.parseString(string(expected))
+
+	fmt.Println("received: ", receivedStr)
+	fmt.Println("expected: ", expectedStr)
 
 	return receivedStr == expectedStr
 }
@@ -154,6 +159,9 @@ func (c *Checker) Check(submission *models.Submission) error {
 		}
 
 		submissionOutput, err := c.openSubmissionOutputFile(submission, test)
+		fmt.Println("SUBMISSION OUTPUT:", string(submissionOutput))
+		fmt.Println(err)
+
 		if err != nil {
 			c.logger.Println(err)
 

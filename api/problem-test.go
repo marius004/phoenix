@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/marius004/phoenix/internal/models"
@@ -38,13 +39,14 @@ func (s *API) CreateTest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.testManager.SaveInputTest(uint(test.Id), problem.Name, data.Input); err != nil {
+	fmt.Println(data.Input, data.Output)
+	if err := s.testManager.SaveInputTest(uint(test.Id), problem.Name, []byte(data.Input)); err != nil {
 		s.logger.Println(err)
 		util.ErrorResponse(w, http.StatusInternalServerError, "Could not create input file", s.logger)
 		return
 	}
 
-	if err := s.testManager.SaveOutputTest(uint(test.Id), problem.Name, data.Output); err != nil {
+	if err := s.testManager.SaveOutputTest(uint(test.Id), problem.Name, []byte(data.Output)); err != nil {
 		s.logger.Println(err)
 		util.ErrorResponse(w, http.StatusInternalServerError, "Could not create output file", s.logger)
 		return
