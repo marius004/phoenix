@@ -25,6 +25,15 @@ const (
 							VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id`
 )
 
+// func (s *ProblemService) filterProblems(problems []*models.Problem, user *models.User) []*models.Problem {
+// 	var ret []*models.Problem
+
+// 	for _, problem := range problems {
+// 		if && s.canSeeUnvisibleProblem
+// 	}
+
+// }
+
 func (s *ProblemService) GetByFilter(ctx context.Context, filter *models.ProblemFilter) ([]*models.Problem, error) {
 	var problems []*models.Problem
 	queryList, args := s.filterMaker(filter)
@@ -33,13 +42,31 @@ func (s *ProblemService) GetByFilter(ctx context.Context, filter *models.Problem
 		if err := s.db.Select(&problems, "SELECT * FROM problems WHERE visible = true"); err != nil {
 			return nil, err
 		}
-		return problems, nil
+	} else {
+		query := s.db.Rebind(fmt.Sprintf("SELECT * FROM problems WHERE %s", strings.Join(queryList, " AND ")))
+
+		if err := s.db.Select(&problems, query, args...); err != nil {
+			return nil, err
+		}
 	}
 
-	query := s.db.Rebind(fmt.Sprintf("SELECT * FROM problems WHERE %s", strings.Join(queryList, " AND ")))
+	// if the user is an admin append all the unvisible problems
+	// if the user is a proposer only append the problems created by that user.
+	user := util.UserFromRequestContext(ctx)
+	var unvisibleProblems []*models.Problem
 
-	if err := s.db.Select(&problems, query, args...); err != nil {
+	if err := s.db.Select(&unvisibleProblems, "SELECT * FROM problems WHERE visible = false"); err != nil {
 		return nil, err
+	}
+
+	if util.IsAdmin(user) && unvisibleProblems != nil {
+		problems = append(problems, unvisibleProblems...)
+	} else if util.IsProposer(user) {
+		for _, problem := range problems {
+			if canSeeUnvisibleProblem(user, problem) {
+				problems = append(problems, problem)
+			}
+		}
 	}
 
 	return problems, nil
@@ -48,25 +75,20 @@ func (s *ProblemService) GetByFilter(ctx context.Context, filter *models.Problem
 func (s *ProblemService) GetById(ctx context.Context, id int) (*models.Problem, error) {
 	var problem models.Problem
 	err := s.db.GetContext(ctx, &problem, s.db.Rebind("SELECT * FROM problems where id = ? LIMIT 1"), id)
+	fmt.Println(err)
 
 	if err != nil {
 		s.logger.Println(err)
 		return nil, err
+	}
+
+	// if the requested problem is unpublished check whether the user can see the problem!
+	user := util.UserFromRequestContext(ctx)
+	if !problem.Visible && !canSeeUnvisibleProblem(user, &problem) {
+		return nil, nil
 	}
 
 	return &problem, err
-}
-
-func (s *ProblemService) GetAll(ctx context.Context) ([]*models.Problem, error) {
-	var problems []*models.Problem
-	err := s.db.Select(&problems, "SELECT * FROM problems WHERE visible = true")
-
-	if err != nil {
-		s.logger.Println(err)
-		return nil, err
-	}
-
-	return problems, err
 }
 
 func canSeeUnvisibleProblem(user *models.User, problem *models.Problem) bool {
@@ -86,6 +108,7 @@ func (s *ProblemService) GetByName(ctx context.Context, name string) (*models.Pr
 		return nil, err
 	}
 
+	// if the requested problem is unpublished check whether the user can see the problem!
 	user := util.UserFromRequestContext(ctx)
 	if !problem.Visible && !canSeeUnvisibleProblem(user, problem) {
 		problem = nil

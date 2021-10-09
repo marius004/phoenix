@@ -21,10 +21,6 @@ const ProblemsPage = () => {
     const [problems, setProblems] = React.useState([]);
     const query = useQuery();
 
-    useEffect(() => {
-        //console.log(query.get("grade"))
-    }, []);
-
     const fetchProblems = async () => {
         try {
             const problems = await problemAPI.getAll();

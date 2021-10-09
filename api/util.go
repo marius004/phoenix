@@ -24,15 +24,11 @@ const (
 func (s *API) canManageProblemResources(r *http.Request, problem *models.Problem) bool {
 	user := util.UserFromRequestContext(r.Context())
 
-	if user == nil || problem == nil {
-		return false
-	}
-
-	if util.IsRAdmin(r) {
+	if util.IsAdmin(user) {
 		return true
 	}
 
-	if util.IsRProposer(r) && problem.AuthorId == user.Id {
+	if util.IsProposer(user) && problem != nil && problem.AuthorId == user.Id {
 		return true
 	}
 
@@ -41,14 +37,14 @@ func (s *API) canManageProblemResources(r *http.Request, problem *models.Problem
 
 func (s *API) canSeeSubmissionSourceCode(r *http.Request, submission *models.Submission, problem *models.Problem) bool {
 	user := util.UserFromRequestContext(r.Context())
-	return util.IsRAdmin(r) ||
+	return util.IsAdmin(user) ||
 		s.canProposerSeeSourceCode(r, problem) ||
 		(uint64(submission.UserId) == user.Id)
 }
 
 func (s *API) canProposerSeeSourceCode(r *http.Request, problem *models.Problem) bool {
 	user := util.UserFromRequestContext(r.Context())
-	return util.IsRProposer(r) && user != nil && problem.AuthorId == user.Id
+	return util.IsProposer(user) && user != nil && problem.AuthorId == user.Id
 }
 
 type serverAuthCookie struct {

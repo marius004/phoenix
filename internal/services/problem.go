@@ -16,9 +16,6 @@ type ProblemService interface {
 	// GetByName looks up a problem by its name
 	GetByName(ctx context.Context, name string) (*models.Problem, error)
 
-	// GetAll retrieves all problems
-	GetAll(ctx context.Context) ([]*models.Problem, error)
-
 	// Create creates a new Problem
 	Create(ctx context.Context, problem *models.Problem, authorId int) error
 

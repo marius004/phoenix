@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from "react";
 import Box from '@material-ui/core/Box';
-import PropTypes from "prop-types";
 
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';

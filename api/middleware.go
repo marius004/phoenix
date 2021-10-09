@@ -13,7 +13,7 @@ import (
 // MustNotBeAuthed is a middleware that makes sure that the user creating the request is not authenticated.
 func (s *API) MustNotBeAuthed(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if util.IsRAuthed(r) {
+		if user := util.UserFromRequestContext(r.Context()); util.IsAuthed(user) {
 			util.ErrorResponse(w, http.StatusUnauthorized, "You must not be logged in to do this", s.logger)
 			return
 		}
@@ -24,7 +24,7 @@ func (s *API) MustNotBeAuthed(next http.Handler) http.Handler {
 // MustBeAuthed is a middleware that makes sure that the user creating the request is authenticated.
 func (s *API) MustBeAuthed(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !util.IsRAuthed(r) {
+		if user := util.UserFromRequestContext(r.Context()); !util.IsAuthed(user) {
 			util.ErrorResponse(w, http.StatusUnauthorized, "You must be logged in to do this", s.logger)
 			return
 		}
@@ -35,7 +35,7 @@ func (s *API) MustBeAuthed(next http.Handler) http.Handler {
 // MustBeAdmin is a middleware that makes sure that the user creating the request is an admin.
 func (s *API) MustBeAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !util.IsRAdmin(r) {
+		if user := util.UserFromRequestContext(r.Context()); !util.IsAdmin(user) {
 			util.ErrorResponse(w, http.StatusUnauthorized, "You must be an admin to do this", s.logger)
 			return
 		}
@@ -46,7 +46,7 @@ func (s *API) MustBeAdmin(next http.Handler) http.Handler {
 // MustBeProposer is a middleware that makes sure that the user creating the request is a proposer.
 func (s *API) MustBeProposer(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !util.IsRProposer(r) {
+		if user := util.UserFromRequestContext(r.Context()); !util.IsProposer(user) {
 			util.ErrorResponse(w, http.StatusUnauthorized, "You must be a proposer to do this", s.logger)
 			return
 		}

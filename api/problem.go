@@ -80,7 +80,7 @@ func (s *API) UpdateProblemByName(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var data models.UpdateProblemRequest
-	if data.Visible && !util.IsRAdmin(r) {
+	if user := util.UserFromRequestContext(r.Context()); problem.Visible && !util.IsAdmin(user) {
 		data.Visible = false
 	}
 

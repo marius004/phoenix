@@ -23,7 +23,7 @@ const Problem = ({problem}) => {
                 }}
                 tabs={[
                     {
-                        tabButton: problem.name,
+                        tabButton: problem.visible ? problem.name : problem.name + " (unpublished) " ,
                         tabIcon: Dashboard,
                         tabContent: (
                             <div style={{maxHeight: "240px", overflow: "auto", padding: "6px"}}>
