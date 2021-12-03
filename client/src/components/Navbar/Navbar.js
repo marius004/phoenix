@@ -6,7 +6,6 @@ import SignupDialog from "./SignupDialog.js";
 import HeaderLinks from "components/Header/HeaderLinks.js";
 
 export default function Navbar({color, fixed}) {
-
     const [showLogin, setShowLogin] = useState(false);
     const [showSignup, setShowSignup] = useState(false);
 

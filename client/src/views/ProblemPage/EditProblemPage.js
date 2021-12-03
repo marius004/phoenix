@@ -90,15 +90,15 @@ export default function EditProblemPage() {
                     },
                     {
 
-                        tabButton: "Descriere",
+                        tabButton: "Description",
                         tabContent: <DescriptionEditTab problem={problem} setProblem={setProblem}/>,
                     },
                     {
-                        tabButton: "Descriere scurta",
+                        tabButton: "Short Description",
                         tabContent: <ShortDescriptionEditTab problem={problem} setProblem={setProblem}/>,
                     }, 
                     {
-                        tabButton: "Creare test",
+                        tabButton: "Create Test",
                         tabContent: <CreateTestEditTab problem={problem} />,
                     }
                 ]}

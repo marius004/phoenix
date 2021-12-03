@@ -56,11 +56,11 @@ export default function ShortDescriptionEditTab({problem, setProblem}) {
             />
             <div style={{border: "1px solid #01579b", padding: "12px", marginBottom: "20px"}}>
                 <h4>
-                    Descrierea scurta problemei trebuie sa fie 
-                    <a href="https://www.markdownguide.org/"> markdown </a> valid!
+                    The problem description must be written in 
+                    <a href="https://www.markdownguide.org/"> markdown </a>!
                 </h4>
                 
-                <h4 style={{fontWeight: "bold"}}>Editeaza descrierea scurta a problemei</h4>
+                <h4 style={{fontWeight: "bold"}}>Edit the problem short description</h4>
                 <MDEditor
                     value={shortDescription}
                     onChange={setShortDescription}
@@ -68,7 +68,7 @@ export default function ShortDescriptionEditTab({problem, setProblem}) {
                 />
 
                 <Button onClick={handleShortDescriptionUpdate} type="submit" variant="contained" color="primary" >
-                    Actualizeaza
+                    Update
                 </Button>
             </div>
         </div>

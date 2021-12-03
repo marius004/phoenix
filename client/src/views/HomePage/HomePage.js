@@ -28,7 +28,7 @@ export default function Components() {
                   style={{ fontWeight: 500 }} 
                   className={classes.subtitle}
                   >
-                  O platforma moderna pentru a invata programare
+                  A modern platform for learning programming
                 </h3>
               </div>
             </GridItem>

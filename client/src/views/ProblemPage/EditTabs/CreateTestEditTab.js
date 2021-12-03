@@ -86,7 +86,7 @@ export default function CreateTestEditTab({problem}) {
                     style={{resize: "none", width: "100%", minHeight: "200px"}}
                 />
                 <Button onClick={handleCreateTest} variant="contained" color="primary" >
-                    Creaza
+                    Create
                 </Button>
             </div>
         </div>

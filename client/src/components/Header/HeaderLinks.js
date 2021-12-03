@@ -87,42 +87,19 @@ export default function HeaderLinks(props) {
   return (
     <List className={classes.list}>
       <ListItem className={classes.listItem}>
-        <CustomDropdown
-          noLiPadding
-          buttonText="Probleme"
-          buttonProps={{
-            className: classes.navLink,
-            color: "transparent",
-          }}
-          buttonIcon={Apps}
-          dropdownList={[
-            <Link to="/problems" className={classes.dropdownLink}>
-               Toate 
-            </Link>,
-            <Link to="/" className={classes.dropdownLink}>
-                Clasa a IX-a
-            </Link>,
-            <Link to="/" className={classes.dropdownLink}>
-                Clasa a X-a
-            </Link>,
-            <Link to="/" className={classes.dropdownLink}>
-                Clasa a XI-a
-            </Link>,
-             <Link to="/" className={classes.dropdownLink}>
-               Concursuri
-            </Link>,
-          ]}
-        />
+        <Link to="/problems" className={classes.navLink}>
+          Problems
+        </Link>
       </ListItem>
       <ListItem className={classes.listItem}>
         <Link to="/submissions" className={classes.navLink}>
-            Submisii
+          Submissions
         </Link>
       </ListItem>
       <ListItem className={classes.listItem}>
         <CustomDropdown
           noLiPadding
-          buttonText="Resurse"
+          buttonText="Resourses"
           buttonProps={{
             className: classes.navLink,
             color: "transparent",
@@ -131,10 +108,13 @@ export default function HeaderLinks(props) {
           dropdownList={[
             // TODO
             <Link to="/" className={classes.dropdownLink}>
-                Competitive Programming
+              Design Patterns
             </Link>,
             <Link to="/" className={classes.dropdownLink}>
-                Web Development
+              Competitive Programming
+            </Link>,
+            <Link to="/" className={classes.dropdownLink}>
+              Concurrency
             </Link>,
           ]}
         />
@@ -145,13 +125,13 @@ export default function HeaderLinks(props) {
           <ListItem className={classes.listItem}>
             <Button style={{ paddingLeft: "8px", paddingRight: "8px"}} color="transparent" onClick={props.onSignup}>
               <i style={{ fontSize: "18px", marginRight: "4px" }} className="fa fa-user" aria-hidden="true"></i>
-              Inregistrare
+              Sign up
             </Button>
           </ListItem>
           <ListItem className={classes.listItem}>
             <Button style={{ paddingLeft: "8px", paddingRight: "8px" }} color="transparent" onClick={props.onLogin}>
               <i style={{ fontSize: "18px", marginRight: "4px" }} className="fa fa-sign-in" aria-hidden="true"></i>
-              Autentificare
+              Log in
             </Button>
           </ListItem>
         </>

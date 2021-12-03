@@ -196,7 +196,7 @@ export default function SignupDialog(props) {
                 <Button style={{ width: "100%", marginTop: "30px" }} 
                         color="rose" round type="submit" 
                         onSubmit={formik.onSubmit}>
-                    Inregistrare
+                    Sign up
                 </Button>
             </form>
         </DialogContent>

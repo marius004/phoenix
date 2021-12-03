@@ -158,7 +158,7 @@ export default function LoginDialog(props) {
 
                 <Button style={{ width: "100%", marginTop: "30px" }} 
                     color="rose" round type="submit">
-                    Autentificare
+                    Log in
                 </Button>
             </form>
         </DialogContent>

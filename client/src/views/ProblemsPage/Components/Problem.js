@@ -30,14 +30,14 @@ const Problem = ({problem}) => {
                                 <MDEditor.Markdown style={{marginBottom: "20px"}} source={problem.shortDescription}/>
                                 <Link to={problemLink()}>
                                     <Button variant="contained" color="primary">
-                                        Rezolva
+                                        Solve
                                     </Button>
                                 </Link>
                             </div>
                         ),
                     },  
                     {
-                        tabButton: "Statistici",
+                        tabButton: "About",
                         tabIcon: EqualizerIcon,
                         tabContent: (
                             <div style={{maxHeight: "240px", overflow: "auto", padding: "6px"}}>

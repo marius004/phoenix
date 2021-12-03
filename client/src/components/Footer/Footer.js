@@ -43,7 +43,7 @@ export default function Footer(props) {
             <ListItem className={classes.inlineBlock}>
               <a href="/about" className={classes.block}>
                 <InfoIcon style={{ fontSize: 18, transform: "translate(0, 4px)" }} /> {"  "}
-                 Despre
+                 About
               </a>
             </ListItem>
             <ListItem className={classes.inlineBlock}>

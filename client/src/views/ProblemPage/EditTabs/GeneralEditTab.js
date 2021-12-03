@@ -128,7 +128,7 @@ export default function GeneralEditTab({problem, setProblem}) {
                     onChange={onGradeChange}
                     type="number"
                     id="outlined-secondary"
-                    label="Clasa"
+                    label="Grade"
                     variant="outlined"
                     color="secondary"
                     style={{width: "99%"}}
@@ -165,10 +165,10 @@ export default function GeneralEditTab({problem, setProblem}) {
                 />
                 <br/>
                 <Button onClick={handleProblemUpdate} type="submit" variant="contained" color="primary" >
-                    Actualizeaza
+                    Update
                 </Button>
                 <Button onClick={handleDeleteProblem} type="submit" variant="contained" style={{backgroundColor: "#d50000", color: "white"}} >
-                    Sterge problema 
+                    Delete Problem
                 </Button>
             </div>
         </div>

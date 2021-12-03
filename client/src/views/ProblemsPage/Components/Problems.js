@@ -14,7 +14,7 @@ const Problems = ({problems}) => {
     return(
         <div className={classes.sections} style={{padding: "22px 26px"}}>
             <h3 style={{fontWeight: "bold"}}>
-                Set de probleme {"    "}
+                Problems {"    "}
                 <span style={{padding: "6px", color: "white", borderRadius: "5px" ,backgroundColor: "#4db6ac"}}>
                     {problems && problems.length ? problems.length : 0}
                 </span>
