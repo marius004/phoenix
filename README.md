@@ -5,3 +5,5 @@
 Phoenix is a work in progress platform for learning programming.
 
 [![Phoenix](https://img.youtube.com/vi/RNQaX0NOwOM/0.jpg)](https://www.youtube.com/watch?v=RNQaX0NOwOM&ab_channel=mariusstefanscarlat "Phoenix on youtube")
+
+Demo: https://www.youtube.com/watch?v=RNQaX0NOwOM&ab_channel=mariusstefanscarlat
