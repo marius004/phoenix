@@ -15,6 +15,7 @@ import GeneralEditTab from "./EditTabs/GeneralEditTab";
 import DescriptionEditTab from "./EditTabs/DescriptionEditTab";
 import ShortDescriptionEditTab from "./EditTabs/ShortDescriptionEditTab";
 import CreateTestEditTab from "./EditTabs/CreateTestEditTab";
+import UpdateTests from "./EditTabs/UpdateTests";
 
 export default function EditProblemPage() {
     const {problemName} = useParams();
@@ -79,7 +80,7 @@ export default function EditProblemPage() {
         <Navbar color="white" fixed ={false}/> 
         <Container style={{border: "1px solid grey", marginTop: "100px", marginBottom: "50px"}}>
             <h3>
-                Editare Problema  {"  "}
+                Edit Problem  {"  "}
                 <Link to={problemLink} style={{color: "blue"}}>{problemName}</Link>
             </h3>
             <NavPills color = "info"
@@ -100,6 +101,10 @@ export default function EditProblemPage() {
                     {
                         tabButton: "Create Test",
                         tabContent: <CreateTestEditTab problem={problem} />,
+                    }, 
+                    {
+                        tabButton: "Update Tests",
+                        tabContent: <UpdateTests problem={problem} />,
                     }
                 ]}
             />

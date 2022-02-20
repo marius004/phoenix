@@ -85,15 +85,15 @@ func (s *API) UpdateTestById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if data.Input != nil && len(data.Input) > 0 {
-		if err := s.testManager.SaveInputTest(uint(test.Id), problem.Name, data.Input); err != nil {
+	if data.Input != "" && len(data.Input) > 0 {
+		if err := s.testManager.SaveInputTest(uint(test.Id), problem.Name, []byte(data.Input)); err != nil {
 			util.ErrorResponse(w, http.StatusInternalServerError, "Could not update input test", s.logger)
 			return
 		}
 	}
 
-	if data.Output != nil && len(data.Output) > 0 {
-		if err := s.testManager.SaveOutputTest(uint(test.Id), problem.Name, data.Output); err != nil {
+	if data.Output != "" && len(data.Output) > 0 {
+		if err := s.testManager.SaveOutputTest(uint(test.Id), problem.Name, []byte(data.Output)); err != nil {
 			util.ErrorResponse(w, http.StatusInternalServerError, "Could not update output test", s.logger)
 			return
 		}

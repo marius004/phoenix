@@ -64,8 +64,8 @@ type TestFilter struct {
 // TODO add input and output validation
 type UpdateTestRequest struct {
 	Score  int    `json:"score"`
-	Input  []byte `json:"input"`
-	Output []byte `json:"output"`
+	Input  string `json:"input"`
+	Output string `json:"output"`
 }
 
 func UpdateTest(test *Test, request *UpdateTestRequest) {
