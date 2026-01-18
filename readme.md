@@ -1,17 +1,6 @@
 # Phoenix 
 
-Phoenix is a work in progress platform for learning data structures and algoritms.
-
-## Description
-
-Being a platform for solving algorithms and data structures problems, Phoenix features 
-a complex code execution environment that allows users to run their source code against 
-custom made tests. After each execution, the user receives a score from 0 to 100 based 
-on the correctitude and runtime performance of the submission. 
-
-<div align="center">[Click on the image for youtube video]</div>
-
-[![Phoenix](https://img.youtube.com/vi/WIkBiAFdZAc/maxresdefault.jpg)](https://www.youtube.com/watch?v=WIkBiAFdZAc)
+Phoenix is a platform designed for learning and practicing data structures and algorithms, offering a robust environment for competitive programming. Built to handle untrusted user code, Phoenix features a secure and scalable code execution sandbox. Leveraging Linux namespaces, cgroups, and the Isolate sandbox, the platform can safely compile and run user-submitted solutions against custom test cases concurrently. This sandboxing mechanism protects the host system from potential risks associated with executing arbitrary code. Users can submit their solutions, which are then executed within the sandboxed environment. The platform provides immediate feedback on both the correctness and runtime performance of the submission, similar to popular platforms like Codeforces or LeetCode.
 
 ## Getting Started
 
